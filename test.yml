@@ -1,0 +1,21 @@
+
+---
+- hosts: all
+  roles:
+    - role: '{{playbook_dir}}'
+      dnsmasq_activate: False
+      dnsmasq_domain_redirects_prefix: '15-'
+      dnsmasq_domain_redirects:
+        - name: consul
+          dns:
+            domain : consul
+            upstream : '127.0.0.1'
+            port : 8600
+            rev_server_cidrs:
+              - '0.0.0.0/8'
+        - name: mesos
+          dns:
+            domain : mesos
+            upstream : '127.0.0.1'
+            port : 8053
+      

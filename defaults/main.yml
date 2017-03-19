@@ -1,0 +1,18 @@
+---
+# defaults file for dnsmasq-configure
+dnsmasq_dropins_dir: /etc/dnsmasq.d
+dnsmasq_activate: True
+
+#dnsmasq_domain_redirects_prefix: '10-'
+dnsmasq_domain_redirects:
+  - name: consul
+    dns:
+      domain : consul
+      upstream : '127.0.0.1'
+      port : 8600
+  - name: mesos
+    dns:
+      domain : mesos
+      upstream : '127.0.0.1'
+      port : 8053
+
