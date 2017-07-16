@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Andrew Rothstein
-  description: '@TODO name this role'
+  description: configures dnsmasq
   company: BlackRock
   license:
     - MIT
@@ -22,5 +22,7 @@ galaxy_info:
   galaxy_tags:
     - development
 
-dependencies: []
+dependencies:
+  - src: andrewrothstein.dnsmasq
+    version: v2.0.0
   

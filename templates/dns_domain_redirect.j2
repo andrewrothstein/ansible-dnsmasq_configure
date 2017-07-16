@@ -1,7 +1,8 @@
-{% for c in dnsmasq_domain_redirects %}
-# Enable forward lookup of the '{{item.name}}' domain:
+p{% for c in dnsmasq_domain_redirects %}
+# Enable forward lookup of the '{{c.name}}' domain:
 server=/{{c.dns.domain}}/{{c.dns.upstream}}#{{c.dns.port}}
 
-{% for rs in c.dns.rev_server_cidrs %}
+{% for rs in c.dns.rev_server_cidrs|default([]) %}
 rev-server={{rs}},{{c.dns.upstream}}#{c.dns.port}}
+{% endfor %}
 {% endfor %}
