@@ -1,25 +1,14 @@
----
-# defaults file for dnsmasq-configure
-dnsmasq_dropins_dir: /etc/dnsmasq.d
-dnsmasq_activate: True
+# Configuration file for dnsmasq.
+#
+# Format is one option per line, legal options are the same
+# as the long options legal on the command line. See
+# "/usr/sbin/dnsmasq --help" or "man 8 dnsmasq" for details.
 
-#dnsmasq_domain_redirects_prefix: '10-'
-#dnsmasq_domain_redirects:
-#  - name: consul
-#    dns:
-#      domain : consul
-#      upstream : '127.0.0.1'
-#      port : 8600
-#  - name: mesos
-#    dns:
-#      domain : mesos
-#      upstream : '127.0.0.1'
-#      port : 8053
-
-# Listen on this specific port instead of the standard DNS port
-# (53). Setting this to zero completely disables DNS function,
-# leaving only DHCP and/or TFTP.
-#dnsmasq_configure_port: 5353
+{% if dnsmasq_configure_port is defined %}
+port={{dnsmasq_configure_port}}
+{% else %}
+#port=5353
+{% endif %}
 
 # The following two options make you a better netizen, since they
 # tell dnsmasq to filter out queries which the public DNS cannot
@@ -28,13 +17,30 @@ dnsmasq_activate: True
 # these requests from bringing up the link unnecessarily.
 
 # Never forward plain names (without a dot or domain part)
-#dnsmasq_configure_domain_needed: True
+{% if dnsmasq_configure_domain_needed|default(False) %}
+domain-needed
+{% else %}
+#domain-needed
+{% endif %}
 # Never forward addresses in the non-routed address spaces.
-#dnsmasq_configure_bogus_priv: True
+{% if dnsmasq_configure_bogus_priv|default(False) %}
+bogus-priv
+{% else %}
+#bogus-priv
+{% endif %}
+
 # Uncomment these to enable DNSSEC validation and caching:
 # (Requires dnsmasq to be built with DNSSEC option.)
-#dnsmasq_configure_conf_file: /usr/share/dnsmasq/trust-anchors.conf
-#dnsmasq_configure_dnssec: True
+{% if dnsmasq_configure_conf_file is defined %}
+conf-file={{dnsmasq_configure_conf_file}}
+{% else %}
+#conf-file=/usr/share/dnsmasq/trust-anchors.conf
+{% endif %}
+{% if dnsmasq_configure_dnssec|default(False) %}
+dnssec
+{% else %}
+#dnssec
+{% endif %}
 
 # Replies which are not DNSSEC signed may be legitimate, because the domain
 # is unsigned, or may be forgeries. Setting this option tells dnsmasq to
@@ -42,110 +48,172 @@ dnsmasq_activate: True
 # record somewhere between the root and the domain does not exist. 
 # The cost of setting this is that even queries in unsigned domains will need
 # one or more extra DNS queries to verify.
-#dnsmasq_configure_dnssec_check_unsigned: True
+{% if dnsmasq_configure_dnssec_check_unsigned|default(False) %}
+dnssec-check-unsigned
+{% else %}
+#dnssec-check-unsigned
+{% endif %}
+
 # Uncomment this to filter useless windows-originated DNS requests
 # which can trigger dial-on-demand links needlessly.
 # Note that (amongst other things) this blocks all SRV requests,
 # so don't use it if you use eg Kerberos, SIP, XMMP or Google-talk.
 # This option only affects forwarding, SRV records originating for
 # dnsmasq (via srv-host= lines) are not suppressed by it.
-#dnsmasq_configure_filterwin2k: True
+{% if dnsmasq_configure_filterwin2k|default(False) %}
+filterwin2k
+{% else %}
+#filterwin2k
+{% endif %}
 
 # Change this line if you want dns to get its upstream servers from
 # somewhere other that /etc/resolv.conf
-#dnsmasq_configure_resolv_file=/etc/foo/resolv.conf
+{% if dnsmasq_configure_resolv_file|default(False) %}
+resolv-file={{dnsmasq_configure_resolv_file}}
+{% else %}
+#resolv-file=
+{% endif %}
 
 # By  default,  dnsmasq  will  send queries to any of the upstream
 # servers it knows about and tries to favour servers to are  known
 # to  be  up.  Uncommenting this forces dnsmasq to try each query
 # with  each  server  strictly  in  the  order  they   appear   in
 # /etc/resolv.conf
-#dnsmasq_configure_strict_order: True
+{% if dnsmasq_configure_strict_order|default(False) %}
+strict-order
+{% else %}
+#strict-order
+{% endif %}
 
 # If you don't want dnsmasq to read /etc/resolv.conf or any other
 # file, getting its servers from this file instead (see below), then
 # uncomment this.
-#dnsmasq_configure_no_resolv: True
+{% if dnsmasq_configure_no_resolv|default(False) %}
+#no-resolv
+{% else %}
+#no-resolv
+{% endif %}
+
 # If you don't want dnsmasq to poll /etc/resolv.conf or other resolv
 # files for changes and re-read them then uncomment this.
-#dnsmasq_configure_no-poll
+{% if dnsmasq_configure_no_poll|default(False) %}
+no-poll
+{% else %}
+#no-poll
+{% endif %}
 
 # Add other name servers here, with domain specs if they are for
 # non-public domains.
-#dnsmasq_configure_servers:
-#  - domain: localnet
-#    ip: 192.168.0.1
+{% if dnsmasq_configure_servers is defined %}
+{% for server in dnsmasq_configure_servers %}
+server=/{{server.domain}}/{{server.ip}}
+{% endfor %}
+{% else %}
+#server=/localnet/192.168.0.1
+{% endif %}
+
 # Example of routing PTR queries to nameservers: this will send all
 # address->name queries for 192.168.3/24 to nameserver 10.1.2.3
-#dnsmasq_configure_servers:
-#  - domain: '3.168.192.in-addr.arpa'
-#    ip: 10.1.2.3
+#server=/3.168.192.in-addr.arpa/10.1.2.3
 
 # Add local-only domains here, queries in these domains are answered
 # from /etc/hosts or DHCP only.
-#dnsmasq_configure_locals:
-#  - localnet
+{% if dnsmasq_configure_locals is defined %}
+{% for d in dnsmasq_configure_locals %}
+local=/{{d}}/
+{% endfor %}
+{% else %}
+#local=/localnet/
+{% endif %}
 
 # Add domains which you want to force to an IP address here.
 # The example below send any host in double-click.net to a local
 # web-server.
-#dnsmasq_configure_address:
-#  double-click.net: '127.0.0.1'
-dnsmasq_configure_addresses:
-  matchbox.drewfus.org: '172.16.0.1'
+{% if dnsmasq_configure_addresses is defined %}
+{% for h, i in dnsmasq_configure_addresses.items() %}
+address=/{{h}}/{{i}}
+{% endfor %}
+{% else %}
+#address=/double-click.net/127.0.0.1
+{% endif %}
 
 # --address (and --server) work with IPv6 addresses too.
-#dnsmasq_configure_address:
-#  www.thekelleys.org.uk: fe80::20d:60ff:fe36:f83
+#address=/www.thekelleys.org.uk/fe80::20d:60ff:fe36:f83
 
 # Add the IPs of all queries to yahoo.com, google.com, and their
 # subdomains to the vpn and search ipsets:
-#dnsmasq_configure_ipsets:
-#  - domains:
-#      - yahoo.com
-#      - google.com
-#    sets:
-#      - vpn
-#      - search
+{% if dnsmasq_configure_ipsets|default(False) %}
+{% for s in dnsmasq_configure_ipsets %}
+ipset={% s.domains | join('/')}}/{{ s.sets | join(',')}}
+{% end for %}
+{% else %}
+#ipset=/yahoo.com/google.com/vpn,search
+{% endif %}
 
 # You can control how dnsmasq talks to a server: this forces
 # queries to 10.1.2.3 to be routed via eth1
-#dnsmasq_configure_talks:
-#  - server: '10.1.2.3'
-#    target: eth1
+{% if dnsmasq_configure_talks|default(False) %}
+{% for s in dnsmasq_configure_talks %}
+server={{s.server}}@{{s.target}}{% if s.port is defined %}#{{s.port}}{% endif %}
+{% endfor %}
+{% else %}
+# server=10.1.2.3@eth1
+{% endif %}
 
 # and this sets the source (ie local) address used to talk to
 # 10.1.2.3 to 192.168.1.1 port 55 (there must be a interface with that
 # IP on the machine, obviously).
-#dnsmasq_configure_talks:
-#  - server: '10.1.2.3'
-#    target: 192.168.1.1
-#    port: 55
+# server=10.1.2.3@192.168.1.1#55
 
 # If you want dnsmasq to change uid and gid to something other
 # than the default, edit the following lines.
-#dnsmasq_configure_user: root
-#dnsmasq_configure_group: root
+{% if dnsmasq_configure_user|default(False) %}
+user={{dnsmasq_configure_user}}
+{% else %}
+#user=
+{% endif %},
+{% if dnsmasq_configure_group|default(False) %}
+group={{dnsmasq_configure_group}}
+{% else %
+#group=
+{% endif %}
 
 # If you want dnsmasq to listen for DHCP and DNS requests only on
 # specified interfaces (and the loopback) give the name of the
 # interface (eg eth0) here.
 # Repeat the line for more than one interface.
-dnsmasq_configure_interfaces:
-  - enp1s0
+{% if dnsmasq_configure_interfaces|default(False) %}
+{% for i in dnsmasq_configure_interfaces %}
+interface={{i}}
+{% endfor %}
+{% endif %}
 # Or you can specify which interface _not_ to listen on
-dnsmasq_configure_except_interfaces:
-  - wlp3s0
+{% if dnsmasq_configure_except_interfaces|default(False) %}
+{% for ei in dnsmasq_configure_except_iterfaces %}
+except-interface={{ei}}
+{% endfor %}
+{% else %}
+#except-interface=
+{% endif %}
 # Or which to listen on by address (remember to include 127.0.0.1 if
 # you use this.)
-#dnsmasq_configure_listen_addresses:
-#  - '172.16.0.1'
-#  - '127.0.0.1'
+{% if dnsmasq_configure_listen_addresses|default(False) %}
+{% for a in dnsmasq_configure_listen_addresses %}
+listen-address={{a}}
+{% endfor %}
+{% else %}
+#listen-address=
+{% endif %}
 # If you want dnsmasq to provide only DNS service on an interface,
 # configure it as shown above, and then use the following line to
 # disable DHCP and TFTP on it.
-#dnsmasq_configure_no_dhcp_interfaces:
-#  - wlp3s0
+{% if dnsmasq_configure_no_dhcp_interfaces|default(False) %}
+{% for i in dnsmasq_configure_no_dhcp_interfaces %}
+no-dhcp-interface={{i}}
+{% endfor %}
+{% else %}
+#no-dhcp-interface=
+{% endif %}
 
 # On systems which support it, dnsmasq binds the wildcard address,
 # even when it is listening on only some interfaces. It then discards
@@ -154,19 +222,36 @@ dnsmasq_configure_except_interfaces:
 # want dnsmasq to really bind only the interfaces it is listening on,
 # uncomment this option. About the only time you may need this is when
 # running another nameserver on the same machine.
-#dnsmasq_configure_bind_interfaces: True
+{% if dnsmasq_configure_bind_interfaces|default(False) %}
+bind-interfaces
+{% else %}
+#bind-interfaces
+{% endif %}
 
 # If you don't want dnsmasq to read /etc/hosts, uncomment the
 # following line.
-#dnsmasq_configure_no_hosts: True
+{% if dnsmasq_configure_no_hosts|default(False) %}
+no-hosts
+{% else %}
+#no-hosts
+{% endif %}
 # or if you want it to read another file, as well as /etc/hosts, use
 # this.
-#dnsmasq_configure_addn_hosts:
-#  - /etc/banner_add_hosts
+{% if dnsmasq_configure_addn_hosts|default(False) %}
+{% for hf in dnsmasq_configure_addn_hosts %}
+addn-hosts={{hf}}
+{% endfor %}
+{% else %}
+#addn-hosts=/etc/banner_add_hosts
+{% endif %}
 
 # Set this (and domain: see below) if you want to have a domain
 # automatically added to simple names in a hosts-file.
-#dnsmasq_configure_expand_hosts: True
+{% if dnsmasq_configure_expand_hosts|default(False) %}
+expand-hosts
+{% else %}
+#expand-hosts
+{% endif %}
 
 # Set the domain for dnsmasq. this is optional, but if it is set, it
 # does the following things.
@@ -175,51 +260,45 @@ dnsmasq_configure_except_interfaces:
 # 2) Sets the "domain" DHCP option thereby potentially setting the
 #    domain of all systems configured by DHCP
 # 3) Provides the domain part for "expand-hosts"
-dnsmasq_configure_domains:
-  - domain: drewfus.org
+{% if dnsmasq_configure_domains|default(False) %}
+{% for d in dnsmasq_configure_domains %}
+domain={{d.domain}}{% if d.subnet is defined %},{{d.subnet}}{% elsif d.range is defined %},{{d.range.from}},{{d.range.to}}{% endif %}
+{% else %}
+#domain=
+{% endif %}
+
 # Set a different domain for a particular subnet
-dnsmasq_configure_domains:
-  - domain: wireless.thekelleys.org.uk
-    subnet: '192.168.2.0/24'
+#domain=wireless.thekelleys.org.uk,192.168.2.0/24
+
 # Same idea, but range rather then subnet
-dnsmasq_configure_domains:
-  - domain: reserved.thekelleys.org.uk
-    range:
-      from: '192.68.3.100'
-      to: '192.168.3.200'
+#domain=reserved.thekelleys.org.uk,192.68.3.100,192.168.3.200
 
 # Uncomment this to enable the integrated DHCP server, you need
 # to supply the range of addresses available for lease and optionally
 # a lease time. If you have more than one network, you will need to
 # repeat this for each network on which you want to supply DHCP
 # service.
-dnsmasq_configure_dhcp_ranges:
-  - from: '172.16.1.1'
-    to: '172.31.255.255'
+{% if dnsmasq_configure_dhcp_ranges is defined %}
+{% for r in dnsmasq_configure_dhcp_ranges %}
+{% if r.subnet is defined %}
+dhcp-range={{r.subnet}}{% if r.static|default(False) %},static{% endif %}{% if r.ra_only|default(False) %},ra-only{% endif %}{% if r.ra_statless|default(False) %},ra-statless{% endif %}{% if r.ra_names|default(False) %}, ra-names{% endif %}{% if r.duration is defined %},{{r.duration}}{% endif %}
+{% else %}
+dhcp-range={% if r.set is defined %}set:{{r.set}}{% endif %}{r.range.from}},{{r.range.to}}{% if r.slaac|default(False) %},slaac{% endif %}{% if r.netmask is defined %},{{r.netmask}}{% endif %}{% if r.prefix is defined %},{{r.prefix}}{% endif %}{{% if r.duration is defined},{{r.duration}}{% endif %}
+{% endfor %}
+{% endif %}
 
 # This is an example of a DHCP range where the netmask is given. This
 # is needed for networks we reach the dnsmasq DHCP server via a relay
 # agent. If you don't know what a DHCP relay agent is, you probably
 # don't need to worry about this.
-dnsmasq_configure_dhcp_ranges:
-  - from: '192.168.0.50'
-    to: '192.168.0.150'
-    netmask: '255.255.255.0'
-    duration: '12h'
+#dhcp-range=192.168.0.50,192.168.0.150,255.255.255.0,12h
+
 # This is an example of a DHCP range which sets a tag, so that
 # some DHCP options may be set only for this network.
-dnsmasq_configure_dhcp_ranges:
-  - set: red
-    range:
-      from: '192.168.0.50'
-      to: '192.168.0.150'
+#dhcp-range=set:red,192.168.0.50,192.168.0.150
+
 # Use this DHCP range only when the tag "green" is set.
-dnsmasq_configure_dhcp_ranges:
-  - set: green
-    range:
-      from: '192.168.0.50'
-      to: '192.168.0.150'
-    duration: '12h'
+#dhcp-range=tag:green,192.168.0.50,192.168.0.150,12h
 
 # Specify a subnet which can't be used for dynamic address allocation,
 # is available for hosts with matching --dhcp-host lines. Note that
@@ -228,68 +307,49 @@ dnsmasq_configure_dhcp_ranges:
 # In this case the netmask is implied (it comes from the network
 # configuration on the machine running dnsmasq) it is possible to give
 # an explicit netmask instead.
-dnsmasq_configure_dhcp_ranges:
-  - static: '192.168.0.0'
+#dhcp-range=192.168.0.0,static
 
 # Enable DHCPv6. Note that the prefix-length does not need to be specified
 # and defaults to 64 if missing/
-dnamsq_configure_dhcp_ranges:
-  - range:
-      from: '1234::2'
-      to: '1234::500'
-    prefix: 64
-    duration: '12h'
+#dhcp-range=1234::2, 1234::500, 64, 12h
 
 # Do Router Advertisements, BUT NOT DHCP for this subnet.
-dnsmasq_configure_dhcp_ranges:
-  - subnet: '1234::'
-    ra_only: True
+#dhcp-range=1234::, ra-only 
 
 # Do Router Advertisements, BUT NOT DHCP for this subnet, also try and
 # add names to the DNS for the IPv6 address of SLAAC-configured dual-stack 
 # hosts. Use the DHCPv4 lease to derive the name, network segment and 
 # MAC address and assume that the host will also have an
 # IPv6 address calculated using the SLAAC alogrithm.
-dnsmasq_configure_dhcp_ranges:
-  - subnet: '1234::'
-    ra_names: True
+#dhcp-range=1234::, ra-names
 
 # Do Router Advertisements, BUT NOT DHCP for this subnet.
 # Set the lifetime to 46 hours. (Note: minimum lifetime is 2 hours.)
-dnsmasq_configure_dhcp_ranges:
-  - subnet:  '1234::'
-    ra_only: True
-    duration: '48h'
+#dhcp-range=1234::, ra-only, 48h
 
 # Do DHCP and Router Advertisements for this subnet. Set the A bit in the RA
 # so that clients can use SLAAC addresses as well as DHCP ones.
-dnsmasq_configure_dhcp_ranges:
-  - range:
-      from: '1234::2'
-      to: '1234::500'
-    slaac: True
+#dhcp-range=1234::2, 1234::500, slaac
 
 # Do Router Advertisements and stateless DHCP for this subnet. Clients will
 # not get addresses from DHCP, but they will get other configuration information.
 # They will use SLAAC for addresses.
-dnsmasq_configure_dhcp_ranges:
-  - subnet: '1234::'
-    ra_stateless: True
+#dhcp-range=1234::, ra-stateless
 
 # Do stateless DHCP, SLAAC, and generate DNS names for SLAAC addresses
 # from DHCPv4 leases.
 #dhcp-range=1234::, ra-stateless, ra-names
-dnsmasq_configure_dhcp_ranges:
-  - subnet: '1234::'
-    ra_stateless: True
-    ra_names: True
 
 # Do router advertisements for all subnets where we're doing DHCPv6
 # Unless overriden by ra-stateless, ra-names, et al, the router 
 # advertisements will have the M and O bits set, so that the clients
 # get addresses and configuration from DHCPv6, and the A bit reset, so the 
 # clients don't use SLAAC addresses.
-#dnsmasq_configure_enable_ra: True
+{% if dnsmasq_configure_enable_ra|default(False) %}
+enable-ra
+{% else %}
+#enable-ra
+{% endif %}
 
 # Supply parameters for specified hosts using DHCP. There are lots
 # of valid alternatives, so we will give examples of each. Note that
@@ -298,25 +358,21 @@ dnsmasq_configure_dhcp_ranges:
 # do not matter, it's permissible to give name, address and MAC in any
 # order.
 
+{% for h in dnsmasq_configure_dhcp_hosts %}
+dhcp-host={% if h.macs is defined %}{{h.macs|join(","}}{% else %}{{h.mac}}{% endif %}{% if h.host is defined %},{{h.host}}{% endif %}{% if h.address is defined %},{{h.address}}{% endif %}{% if h.ipv6 is defined %},[{{h.ipv6}}]{% endif %}{% if h.duration is defined %},{{h.duration}}{% endif %}{% if h.infinite|default(False) %},infinite{% endif %}{% if h.ignore|default(False) %},ignore{% endif %}{% if h.ignore_all|default(False) %},id:*{% endif %}{% if h.set is defined %},set:{{h.set}}{% endif %}
+{% endfor %}
+
 # Always allocate the host with Ethernet address 11:22:33:44:55:66
 # The IP address 192.168.0.60
-dnsmasq_configure_dhcp_hosts:
-  - mac: '11:22:33:44:55:66'
-    ip: '192.168.0.60'
+#dhcp-host=11:22:33:44:55:66,192.168.0.60
 
 # Always set the name of the host with hardware address
 # 11:22:33:44:55:66 to be "fred"
-dnsmasq_configure_dhcp_hosts:
-  - mac: '11:22:33:44:55:66'
-    host: fred
+#dhcp-host=11:22:33:44:55:66,fred
 
 # Always give the host with Ethernet address 11:22:33:44:55:66
 # the name fred and IP address 192.168.0.60 and lease time 45 minutes
-dnsmasq_configure_dhcp_hosts:
-  - mac: '11:22:33:44:55:66'
-    host: fred
-    address: '192.168.0.60'
-    duration: '45m'
+#dhcp-host=11:22:33:44:55:66,fred,192.168.0.60,45m
 
 # Give a host with Ethernet address 11:22:33:44:55:66 or
 # 12:34:56:78:90:12 the IP address 192.168.0.60. Dnsmasq will assume
@@ -324,110 +380,93 @@ dnsmasq_configure_dhcp_hosts:
 # time, and give the IP address to the second, even if it is already
 # in use by the first. Useful for laptops with wired and wireless
 # addresses.
-dnsmasq_configure_dhcp_hosts:
-  - macs:
-      - '11:22:33:44:55:66'
-      - '12:34:56:78:90:12'
-    address: '192.168.0.60'
+#dhcp-host=11:22:33:44:55:66,12:34:56:78:90:12,192.168.0.60
 
 # Give the machine which says its name is "bert" IP address
 # 192.168.0.70 and an infinite lease
-dnsmasq_configure_dhcp_hosts:
-  - mac: bert
-    address: '192.168.0.70'
-    infinite: True
+#dhcp-host=bert,192.168.0.70,infinite
 
 # Always give the host with client identifier 01:02:02:04
 # the IP address 192.168.0.60
-dnsmasq_configure_dhcp_hosts:
-  - mac: id:01:02:02:04
-    address: '192.168.0.60'
+#dhcp-host=id:01:02:02:04,192.168.0.60
 
 # Always give the Infiniband interface with hardware address
 # 80:00:00:48:fe:80:00:00:00:00:00:00:f4:52:14:03:00:28:05:81 the
 # ip address 192.168.0.61. The client id is derived from the prefix
 # ff:00:00:00:00:00:02:00:00:02:c9:00 and the last 8 pairs of
 # hex digits of the hardware address.
-dnsmasq_configure_dhcp_hosts:
-  - mac: id:ff:00:00:00:00:00:02:00:00:02:c9:00:f4:52:14:03:00:28:05:81
-    address: '192.168.0.61'
+#dhcp-host=id:ff:00:00:00:00:00:02:00:00:02:c9:00:f4:52:14:03:00:28:05:81,192.168.0.61
 
 # Always give the host with client identifier "marjorie"
 # the IP address 192.168.0.60
-dnsmasq_configure_dhcp_hosts:
-  - mac: id:marjorie
-    address: '192.168.0.60'
+#dhcp-host=id:marjorie,192.168.0.60
 
 # Enable the address given for "judge" in /etc/hosts
 # to be given to a machine presenting the name "judge" when
 # it asks for a DHCP lease.
-dnsmasq_configure_dhcp_hosts:
-  - mac: judge
+#dhcp-host=judge
 
 # Never offer DHCP service to a machine whose Ethernet
 # address is 11:22:33:44:55:66
-dnsmasq_configure_dhcp_hosts:
-  - mac: '11:22:33:44:55:66'
-    ignore: True
+#dhcp-host=11:22:33:44:55:66,ignore
 
 # Ignore any client-id presented by the machine with Ethernet
 # address 11:22:33:44:55:66. This is useful to prevent a machine
 # being treated differently when running under different OS's or
 # between PXE boot and OS boot.
-dnsmasq_configure_dhcp_hosts:
-  - mac: '11:22:33:44:55:66'
-    ignore_all: True
+#dhcp-host=11:22:33:44:55:66,id:*
 
 # Send extra options which are tagged as "red" to
 # the machine with Ethernet address 11:22:33:44:55:66
-dnsmasq_configure_dhcp_hosts:
-  - mac: '11:22:33:44:55:66'
-    set: red
+#dhcp-host=11:22:33:44:55:66,set:red
 
 # Send extra options which are tagged as "red" to
 # any machine with Ethernet address starting 11:22:33:
-dnsmasq_configure_dhcp_hosts:
-  - mac: '11:22:33:*:*:*'
-    set: red
+#dhcp-host=11:22:33:*:*:*,set:red
 
 # Give a fixed IPv6 address and name to client with 
 # DUID 00:01:00:01:16:d2:83:fc:92:d4:19:e2:d8:b2
 # Note the MAC addresses CANNOT be used to identify DHCPv6 clients.
 # Note also the they [] around the IPv6 address are obilgatory.
-dnsmasq_configure_dhcp_hosts:
-  - mac: id:00:01:00:01:16:d2:83:fc:92:d4:19:e2:d8:b2
-    host: fred
-    ipv6: '1234::5'
+#dhcp-host=id:00:01:00:01:16:d2:83:fc:92:d4:19:e2:d8:b2, fred, [1234::5] 
 
 # Ignore any clients which are not specified in dhcp-host lines
 # or /etc/ethers. Equivalent to ISC "deny unknown-clients".
 # This relies on the special "known" tag which is set when
 # a host is matched.
-#dnsmasq_configure_dhcp_ignore_tag: !known
+{% if dnsmasq_configure_dhcp_ignore_tag is defined %}
+dhcp-ignore=tag:{{dnsmasq_configure_dhcp_ignore_tag}}
+{% else %}
+#dhcp-ignore=tag:!known
+{% endif %}
 
 # Send extra options which are tagged as "red" to any machine whose
 # DHCP vendorclass string includes the substring "Linux"
-dnsmasq_configure_dhcp_vendorclasses:
-  - set: red
-    includes: Linux
+{% for vc in dnsmasq_configure_dhcp_vendor_classes %}
+dhcp-vendorclass=set:{{vc.set}},{{vc.includes}}
+{% endfor %}
 
 # Send extra options which are tagged as "red" to any machine one
 # of whose DHCP userclass strings includes the substring "accounts"
-dnsmasq_configure_dhcp_userclasses:
-  - set: red
-    includes: accounts
+{% for uc in dnsmasq_configure_dhcp_user_classes %}
+dhcp-userclass=set:{{uc.set}},{{uc.includes}}
+{% endfor %}
 
 # Send extra options which are tagged as "red" to any machine whose
 # MAC address matches the pattern.
-dnsmasq_configure_dhcp_macs:
-  - set: red
-    mac_pattern: '00:60:8C:*:*:*'
+{% for m in dnsmasq_configure_dhcp_macs %}
+dhcp-mac=set:{{m.set}},{{m.mac_pattern}}
+{% endfor %}
 
 # If this line is uncommented, dnsmasq will read /etc/ethers and act
 # on the ethernet-address/IP pairs found there just as if they had
 # been given as --dhcp-host options. Useful if you keep
 # MAC-address/host mappings there for other purposes.
-#dnsmasq_configure_read_ethers: True
+{% if dnsmasq_configure_read_ethers|default(False) %}
+read-ethers
+{% else %}
+#read-ethers
+{% endif %}
 
 # Send options to hosts which ask for a DHCP lease.
 # See RFC 2132 for details of available options.
@@ -440,98 +479,65 @@ dnsmasq_configure_dhcp_macs:
 # are some options which are recommended, they are detailed at the
 # end of this section.
 
+{% for o in dnsmasq_configure_dhcp_options %}
+dhcp-option{% if o.force|default(False) %}-force{% endif %}={% if o.tag is defined %}{{o.tag}},{% endif %}{{o.opt}},{% if o.val is defined %}{{o.val}}{% else %}{{o.vals|default([])|join(",")}}{% endif %}
+{% endfor %}
+
 # Override the default route supplied by dnsmasq, which assumes the
 # router is the same machine as the one running dnsmasq.
-dnsmasq_configure_dhcp_options:
-  - opt: 3
-    val: '1.2.3.4'
+#dhcp-option=3,1.2.3.4
 
 # Do the same thing, but using the option name
-dnsmasq_configure_dhcp_options:
-  - opt: option:router
-    val: '1.2.3.4'
+#dhcp-option=option:router,1.2.3.4
 
 # Override the default route supplied by dnsmasq and send no default
 # route at all. Note that this only works for the options sent by
 # default (1, 3, 6, 12, 28) the same line will send a zero-length option
 # for all other option numbers.
-dnsmasq_configure_dhcp_options:
-  - opt: 3
+#dhcp-option=3
 
 # Set the NTP time server addresses to 192.168.0.4 and 10.10.0.5
-dnsmasq_configure_dhcp_options:
-  - opt: option:ntp-server
-    vals:
-      - '192.168.0.4'
-      - '10.10.0.5'
+#dhcp-option=option:ntp-server,192.168.0.4,10.10.0.5
 
 # Send DHCPv6 option. Note [] around IPv6 addresses.
-dnsmasq_configure_dhcp_options:
-  - opt: option6:dns-server
-    vals:
-      - '[1234::77]'
-      - '[1234::88]'
+#dhcp-option=option6:dns-server,[1234::77],[1234::88]
 
 # Send DHCPv6 option for namservers as the machine running 
 # dnsmasq and another.
-dnsmasq_configure_dhcp_options:
-  - opt: option6:dns-server
-    vals:
-      - '[::]'
-      - '[1234::88]'
+#dhcp-option=option6:dns-server,[::],[1234::88]
 
 # Ask client to poll for option changes every six hours. (RFC4242)
-dnsmasq_configure_dhcp_options:
-  - opt: option6:information-refresh-time
-    val: '6h'
+#dhcp-option=option6:information-refresh-time,6h
 
 # Set option 58 client renewal time (T1). Defaults to half of the
 # lease time if not specified. (RFC2132)
-dnsmasq_configure_dhcp_options:
-  - opt: option:T1
-    val: '1m'
+#dhcp-option=option:T1:1m
 
 # Set option 59 rebinding time (T2). Defaults to 7/8 of the
 # lease time if not specified. (RFC2132)
-dnsmasq_configure_dhcp_options:
-  - opt: option:T2
-    val: '2m'
+#dhcp-option=option:T2:2m
 
 # Set the NTP time server address to be the same machine as
 # is running dnsmasq
-dnsmasq_configure_dhcp_options:
-  - opt: 42
-    val: '0.0.0.0'
+#dhcp-option=42,0.0.0.0
 
 # Set the NIS domain name to "welly"
-dnsmasq_configure_dhcp_options:
-  - opt: 40
-    val: welly
+#dhcp-option=40,welly
 
 # Set the default time-to-live to 50
-dnsmasq_configure_dhcp_options:
-  - opt: 23
-    val: 50
+#dhcp-option=23,50
 
 # Set the "all subnets are local" flag
-dnsmasq_configure_dhcp_options:
-  - opt: 27
-    val: 1
+#dhcp-option=27,1
 
 # Send the etherboot magic flag and then etherboot options (a string).
-dnsmasq_configure_dhcp_options:
-  - opt: 128
-    val: e4:45:74:68:00:00
-  - opt: 129
-    val: NIC=eepro100
+#dhcp-option=128,e4:45:74:68:00:00
+#dhcp-option=129,NIC=eepro100
 
 # Specify an option which will only be sent to the "red" network
 # (see dhcp-range for the declaration of the "red" network)
 # Note that the tag: part must precede the option: part.
-dnsmasq_configure_dhcp_options:
-  - tag: red
-    opt: option:ntp-server
-    val: '192.168.1.1'
+#dhcp-option = tag:red, option:ntp-server, 192.168.1.1
 
 # The following DHCP options set up dnsmasq in the same way as is specified
 # for the ISC dhcpcd in
@@ -540,39 +546,20 @@ dnsmasq_configure_dhcp_options:
 # dnsmasq is also the host running samba.
 # you may want to uncomment some or all of them if you use
 # Windows clients and Samba.
-dnsmasq_configure_dhcp_options:
-  - opt: 19
-    val: 0
-  - opt: 44
-    val: 0
-  - opt: 44
-    val: '0.0.0.0'
-  - opt: 45
-    val: '0.0.0.0'
-  - opt: 46
-    val: 8
+#dhcp-option=19,0           # option ip-forwarding off
+#dhcp-option=44,0.0.0.0     # set netbios-over-TCP/IP nameserver(s) aka WINS server(s)
+#dhcp-option=45,0.0.0.0     # netbios datagram distribution server
+#dhcp-option=46,8           # netbios node type
 
 # Send an empty WPAD option. This may be REQUIRED to get windows 7 to behave.
-dnsmasq_configure_dhcp_options:
-  - opt: 252
-    val: '"\n"'
+#dhcp-option=252,"\n"
 
 # Send RFC-3397 DNS domain search DHCP option. WARNING: Your DHCP client
 # probably doesn't support this......
-dnsmasq_configure_dhcp_options:
-  - opt: option:domain-search
-    vals:
-      - eng.apple.com
-      - marketing.apple.com
+#dhcp-option=option:domain-search,eng.apple.com,marketing.apple.com
 
 # Send RFC-3442 classless static routes (note the netmask encoding)
-dnsmasq_configure_dhcp_options:
-  - opt: 121
-    vals:
-      - '192.168.1.0/24'
-      - '1.2.3.4'
-      - '10.0.0.0/8'
-      - '5.6.7.8'
+#dhcp-option=121,192.168.1.0/24,1.2.3.4,10.0.0.0/8,5.6.7.8
 
 # Send vendor-class specific options encapsulated in DHCP option 43.
 # The meaning of the options is defined by the vendor-class so
@@ -580,198 +567,152 @@ dnsmasq_configure_dhcp_options:
 # matches the class given here. (A substring match is OK, so "MSFT"
 # matches "MSFT" and "MSFT 5.0"). This example sets the
 # mtftp address to 0.0.0.0 for PXEClients.
-dnsmasq_configure_dhcp_options:
-  - opt: vendor:PXEClient
-    vals:
-      - 1
-      - '0.0.0.0'
+#dhcp-option=vendor:PXEClient,1,0.0.0.0
 
 # Send microsoft-specific option to tell windows to release the DHCP lease
 # when it shuts down. Note the "i" flag, to tell dnsmasq to send the
 # value as a four-byte integer - that's what microsoft wants. See
 # http://technet2.microsoft.com/WindowsServer/en/library/a70f1bb7-d2d4-49f0-96d6-4b7414ecfaae1033.mspx?mfr=true
-dnmasq_configure_dhcp_options:
-  - opt: vendor:MSFT
-    vals:
-      - 2
-      - '1i'
+#dhcp-option=vendor:MSFT,2,1i
 
 # Send the Encapsulated-vendor-class ID needed by some configurations of
 # Etherboot to allow is to recognise the DHCP server.
-dnsmasq_configure_dhcp_options:
-  - opt: vendor:Etherboot
-    vals:
-      - 60
-      - '"Etherboot"'
+#dhcp-option=vendor:Etherboot,60,"Etherboot"
 
 # Send options to PXELinux. Note that we need to send the options even
 # though they don't appear in the parameter request list, so we need
 # to use dhcp-option-force here.
 # See http://syslinux.zytor.com/pxe.php#special for details.
 # Magic number - needed before anything else is recognised
-dnsmasq_configure_dhcp_options:
-  - force: True
-    opt: 208
-    val: f1:00:74:7e
+#dhcp-option-force=208,f1:00:74:7e
 # Configuration file name
-dnsmasq_configure_dhcp_options:
-  - force: True
-    opt: 209
-    val: configs/common
+#dhcp-option-force=209,configs/common
 # Path prefix
-dnsmasq_configure_dhcp_options:
-  - force: True
-    opt: 10
-    val: /tftpboot/pxelinux/files/
+#dhcp-option-force=210,/tftpboot/pxelinux/files/
 # Reboot time. (Note 'i' to send 32-bit value)
-dnsmasq_configure_dhcp_options:
-  - force: True
-    opt: 211
-    val: '30i'
+#dhcp-option-force=211,30i
+
+{% for b in dnsmasq_configure_dhcp_boots|default([]) %}
+dhcp-boot={% if b.tag is defined %}tag:{{b.tag}},{% endif %},{{b.file}}{% if b.tftp_servername is defined %},{{b.tftp_servername}}{% endif %}{% for sn in b.tftp_servernames|default([]) %},{{sn}}{% endfor %}
+{% endfor %}
+
+{% for m in dnsmasq_configure_dhcp_matches|default([]) %}
+dhcp-match={% if m.set is defined %}set:{{m.set}}{% else %}{{m.opt}}{% endif %},{{m.val}}
+{% endfor %}
 
 # Set the boot filename for netboot/PXE. You will only need
 # this is you want to boot machines over the network and you will need
 # a TFTP server; either dnsmasq's built in TFTP server or an
 # external one. (See below for how to enable the TFTP server.)
-dnsmasq_configure_dhcp_boots:
-  - file: pxelinux.0
+#dhcp-boot=pxelinux.0
 
 # The same as above, but use custom tftp-server instead machine running dnsmasq
-dnsmasq_configure_dhcp_boots:
-  - file: pxelinux
-    host: server.name
-    address: 192.168.1.100
+#dhcp-boot=pxelinux,server.name,192.168.1.100
 
 # Boot for Etherboot gPXE. The idea is to send two different
 # filenames, the first loads gPXE, and the second tells gPXE what to
 # load. The dhcp-match sets the gpxe tag for requests from gPXE.
-# gPXE sends a 175 option.
-dnsmasq_configure_dhcp_matches:
-  - set: gpxe
-    val: 175
-dnsmasq_configure_dhcp_boots:
-  - tag: !gpxe
-    file: undionly.kpxe
-dnsmasq_configure_dhcp_boots:
-  - file: mybootimage
+#dhcp-match=set:gpxe,175 # gPXE sends a 175 option.
+#dhcp-boot=tag:!gpxe,undionly.kpxe
+#dhcp-boot=mybootimage
 
 # Encapsulated options for Etherboot gPXE. All the options are
 # encapsulated within option 175
-dnsmasq_configure_dhcp_options:
-  - opt: encap:175 # priority code
-    vals:
-      - 1
-      - '5b'
-dnsmasq_configure_dhcp_options:
-  - opt: encap:175 # no-proxydhcp
-    vals:
-      - 176
-      - '1b'
-dnsmasq_configure_dhcp_options:
-  - opt: encap:175 # bus-id
-    vals:
-      - 177
-      - string
-dnsmasq_configure_dhcp_options:
-  - opt: encap:175 # BIOS drive code
-    vals:
-      - 189
-      - '1b'
-dnsmasq_configure_dhcp_options:
-  - opt: encap:175 # iSCSI username
-    vals:
-      - 190
-      - user
-dnsmasq_configure_dhcp_options:
-  - opt: encap:175 # iSCSI password
-    vals:
-      - 191
-      - pass
+#dhcp-option=encap:175, 1, 5b         # priority code
+#dhcp-option=encap:175, 176, 1b       # no-proxydhcp
+#dhcp-option=encap:175, 177, string   # bus-id
+#dhcp-option=encap:175, 189, 1b       # BIOS drive code
+#dhcp-option=encap:175, 190, user     # iSCSI username
+#dhcp-option=encap:175, 191, pass     # iSCSI password
 
 # Test for the architecture of a netboot client. PXE clients are
 # supposed to send their architecture as option 93. (See RFC 4578)
-dnsmasq_configure_dhcp_matches:
-  - opt: peecees, option:client-arch
-    val: 0 #x86-32
-  - opt: itanics, option:client-arch
-    val: 2 #IA64
-  - opt: hammers, option:client-arch
-    val: 6 #x86-64
-  - opt: mactels, option:client-arch
-    val: 7 #EFI x86-64
+#dhcp-match=peecees, option:client-arch, 0 #x86-32
+#dhcp-match=itanics, option:client-arch, 2 #IA64
+#dhcp-match=hammers, option:client-arch, 6 #x86-64
+#dhcp-match=mactels, option:client-arch, 7 #EFI x86-64
+
+{% for pp in dnsmasq_configure_pxe_prompts %}
+pxe-prompt={{pp.prompt|to_json}}{% if pp.wait is defined %},{{pp.wait}}{% endif %}
+{% endfor %}
 
 # Do real PXE, rather than just booting a single file, this is an
 # alternative to dhcp-boot.
-dnsmasq_configure_pxe_prompts:
-  - prompt: What system shall I netboot?
+#pxe-prompt="What system shall I netboot?"
 # or with timeout before first available action is taken:
-dnsmasq_configure_pxe_prompts:
-  - prompt: Press F8 for menu.
-    wait: 60
+#pxe-prompt="Press F8 for menu.", 60
+
+{% for ps in dnsmasq_configure_pxe_services %}
+pxe-service={{ps.id}},{{ps.name|to_json}}{% if ps.image is defined %},{{ps.image}}{% endif %}{% if ps.tftp_server is defined %},{{ps.tftp_server}}{% endif %}
+{% endfor %}
 
 # Available boot services. for PXE.
-dnsmasq_configure_pxe_services:
-  - id: x86PC
-    name: Boot from local disk
+#pxe-service=x86PC, "Boot from local disk"
 
 # Loads <tftp-root>/pxelinux.0 from dnsmasq TFTP server.
-dnsmasq_configure_pxe_services:
-  - id: x86PC
-    name: Install Linux
-    image: pxelinux
+#pxe-service=x86PC, "Install Linux", pxelinux
 
 # Loads <tftp-root>/pxelinux.0 from TFTP server at 1.2.3.4.
 # Beware this fails on old PXE ROMS.
-dnsmasq_configure_pxe_services:
-  - id: x86PC
-    name: Install Linux
-    image: pxelinux
-    tftp_server: '1.2.3.4'
+#pxe-service=x86PC, "Install Linux", pxelinux, 1.2.3.4
 
 # Use bootserver on network, found my multicast or broadcast.
-dnsmasq_configure_pxe_services:
-  - id: x86PC
-    name: Install windows from RIS server
-    image: 1
+#pxe-service=x86PC, "Install windows from RIS server", 1
 
 # Use bootserver at a known IP address.
-dnsmasq_configure_pxe_services:
-  - id: x86PC
-    name: Install windows from RIS server
-    image: 1
-    tftp_server: 1.2.3.4
+#pxe-service=x86PC, "Install windows from RIS server", 1, 1.2.3.4
+
+# If you have multicast-FTP available,
+# information for that can be passed in a similar way using options 1
+# to 5. See page 19 of
+# http://download.intel.com/design/archives/wfm/downloads/pxespec.pdf
+
 
 # Enable dnsmasq's built-in TFTP server
-dnsmasq_configure_enable_tftp: True
+{% if dnsmasq_configure_enable_tftp|default(False) %}
+enable-tftp
+{% else %}
+#enable-tftp
+{% endif %}
 
 # Set the root directory for files available via FTP.
-dnsmasq_configure_tftp_root: /var/lib/tftpboot
+{% if dnsmasq_configure_tftp_root is defined %}
+tftp-root={{dnsmasq_configure_tftp_root}}
+{% else %}
+#tftp-root=/var/ftpd
+{% endif %}
 
 # Do not abort if the tftp-root is unavailable
-dnsmasq_configure_tftp_no_fail: True
+{% if dnsmasq_configure_tftp_no_fail|default(False) %}
+tftp-no-fail
+{% else %}
+#tftp-no-fail
+{% endif %}
 
 # Make the TFTP server more secure: with this set, only files owned by
 # the user dnsmasq is running as will be send over the net.
-dnsmasq_configure_tftp_secure: True
+{% if dnsmasq_configure_tftp_secure|default(False) %}
+tftp-secure
+{% else %}
+#tftp-secure
+{% endif %}
 
 # This option stops dnsmasq from negotiating a larger blocksize for TFTP
 # transfers. It will slow things down, but may rescue some broken TFTP
 # clients.
-dnsmasq_configure_tftp_no_blocksize: True
+{% if dnsmasq_configure_tftp_no_blocksize|default(False) %}
+tftp-no-blocksize
+{% else %}
+#tftp-no-blocksize
+{% endif %}
 
 # Set the boot file name only when the "red" tag is set.
-dnsmasq_configure_dhcp_boots:
-  - tag: red
-    file: pxelinux.red-net
+#dhcp-boot=tag:red,pxelinux.red-net
 
 # An example of dhcp-boot with an external TFTP server: the name and IP
 # address of the server are given after the filename.
 # Can fail with old PXE ROMS. Overridden by --pxe-service.
-dnsmasq_configure_dhcp_boots:
-  - file: /var/ftpd/pxelinux.0
-    tftp_serverhosts:
-      - boothost
-      - '192.168.0.3'
+#dhcp-boot=/var/ftpd/pxelinux.0,boothost,192.168.0.3
 
 # If there are multiple external tftp servers having a same name
 # (using /etc/hosts) then that name can be specified as the
@@ -779,19 +720,23 @@ dnsmasq_configure_dhcp_boots:
 # case dnsmasq resolves this name and returns the resultant IP
 # addresses in round robin fasion. This facility can be used to
 # load balance the tftp load among a set of servers.
-dnsmasq_configure_dhcp_boots:
-  - file: /var/ftpd/pxelinux.0
-    tftp_serverhosts:
-      - boothost
-      - tftp_server_name
+#dhcp-boot=/var/ftpd/pxelinux.0,boothost,tftp_server_name
 
 # Set the limit on DHCP leases, the default is 150
-dnsmasq_configure_dhcp_lease_max: 150
+{% if dnsmasq_configure_dhcp_lease_max is defined %}
+dhcp-lease-max={{dnsmasq_configure_dhcp_lease_max}}
+{% else %}
+#dhcp-lease-max=150
+{% endif %}
 
 # The DHCP server needs somewhere on disk to keep its lease database.
 # This defaults to a sane location, but if you want to change it, use
 # the line below.
-dnsmasq_configure_dhcp_leasefile: /var/lib/dnsmasq/dnsmasq.leases
+{% if dnsmasq_configure_dhcp_leasefile is defined %}
+dhcp-leasefile={{dnsmasq_configure_dhcp_leasefile}}
+{% else %}
+#dhcp-leasefile=/var/lib/dnsmasq/dnsmasq.leases
+{% endif %}
 
 # Set the DHCP server to authoritative mode. In this mode it will barge in
 # and take over the lease for any client which broadcasts on the network,
@@ -801,69 +746,107 @@ dnsmasq_configure_dhcp_leasefile: /var/lib/dnsmasq/dnsmasq.leases
 # server for your campus/company accidentally. The ISC server uses
 # the same option, and this URL provides more information:
 # http://www.isc.org/files/auth.html
-dnsmasq_configure_dhcp_authoritative: True
+{% if dnsmasq_configure_dhcp_authoritative|default(False) %}
+dhcp-authoritative
+{% else %}
+#dhcp-authoritative
+{% endif %}
 
 # Run an executable when a DHCP lease is created or destroyed.
 # The arguments sent to the script are "add" or "del",
 # then the MAC address, the IP address and finally the hostname
 # if there is one.
-dnsmasq_configure_dhcp_script: /bin/echo
+{% if dnsmasq_configure_dhcp_script is defined %}
+dhcp-script={{dnsmasq_configure_dhcp_script}}
+{% else %}
+#dhcp-script=/bin/echo
+{% endif %}
 
 # Set the cachesize here.
-dnsmasq_configure_cache_size: 150
+{% if dnsmasq_configure_cache_size is defined %}
+cache-size={{dnsmasq_configure_cache_size}}
+{% else %}
+#cache-size=150
+{% endif %
 
 # If you want to disable negative caching, uncomment this.
-dnsmasq_configure_no_negcache: True
+{% if dnsmasq_configure_no_negcache|default(False) %}
+no-negcache
+{% else %}
+#no-negcache
+{% endif %}
 
 # Normally responses which come from /etc/hosts and the DHCP lease
 # file have Time-To-Live set as zero, which conventionally means
 # do not cache further. If you are happy to trade lower load on the
 # server for potentially stale date, you can set a time-to-live (in
 # seconds) here.
-dnsmasq_configure_local_ttl: 30
+{% if dnsmasq_configure_local_ttl is defined %}
+local-ttl={{dnsmasq_configure_local_ttl}}
+{% else %}
+#local-ttl=
+{% endif %}
 
 # If you want dnsmasq to detect attempts by Verisign to send queries
 # to unregistered .com and .net hosts to its sitefinder service and
 # have dnsmasq instead return the correct NXDOMAIN response, uncomment
 # this line. You can add similar lines to do the same for other
 # registries which have implemented wildcard A records.
-dnsmasq_configure_bogus_nxdomain: '64.94.110.11'
+{% if dnsmasq_configure_bogus_nxdomain is defined %}
+bogus-nxdomain={{dnsmasq_configure_bogus_nxdomain}}
+{% else %}
+#bogus-nxdomain=64.94.110.11
+{% endif %}
 
+{% for a in dnsmasq_configure_aliases %}
+alias={{a.src}},{{a.target}}{% if a.netmask is defined %},{{a.netmask}}{% endif %}
+{% endfor %}
 # If you want to fix up DNS results from upstream servers, use the
 # alias option. This only works for IPv4.
 # This alias makes a result of 1.2.3.4 appear as 5.6.7.8
-dnsmasq_configure_aliases:
-  - src: '1.2.3.4'
-    target: '5.6.7.8'
+#alias=1.2.3.4,5.6.7.8
 # and this maps 1.2.3.x to 5.6.7.x
-dnsmasq_configure_aliases:
-  - src: '1.2.3.0'
-    dest: '5.6.7.0'
-    netmask: '255.255.255.0'
+#alias=1.2.3.0,5.6.7.0,255.255.255.0
 # and this maps 192.168.0.10->192.168.0.40 to 10.0.0.10->10.0.0.40
-dnsmasq_configure_aliases:
-  - src: '192.168.0.10-192.168.0.40'
-    dest: '10.0.0.0'
-    netmask: '255.255.255.0'
+#alias=192.168.0.10-192.168.0.40,10.0.0.0,255.255.255.0
 
 # Change these lines if you want dnsmasq to serve MX records.
 
 # Return an MX record named "maildomain.com" with target
 # servermachine.com and preference 50
-dnsmasq_configure_mx_host:
-  record: maildomain.com
-  target: servermachine.com
-  preference: 50
+{% if dnsmasq_configure_mx_host is defined %}
+mx-host={{dnsmasq_configure_mx_host.record}},{{dnsmasq_configure_mx_host.target}},{{dnsmasq_configure_mx_host.preference}}
+{% else %}
+#mx-host=maildomain.com,servermachine.com,50
+{% endif %}
 
 # Set the default target for MX records created using the localmx option.
-dnsmasq_configure_mx_target: servermachine.com
+{% if dnsmasq_configure_mx_target is defined %}
+mx-target={{dnsmasq_configure_mx_target}}
+{% else %}
+#mx-target=servermachine.com
+{% endif %}
 
 # Return an MX record pointing to the mx-target for all local
 # machines.
-dnsmasq_configure_localmx: True
+{% if dnsmasq_configure_localmx|default(False) %}
+localmx
+{% else %}
+#localmx
+{% endif %}
 
 # Return an MX record pointing to itself for all local machines.
-dnsmasq_configure_selfmx: True
+{% if dnsmasq_configure_selfmx|default(False) %}
+selfmx
+{% else %}
+#selfmx
+{% endif %}
+
+{% for h in dnsmasq_configure_src_hosts %}
+{% if h.domain is defined %}
+domain={{h.domain}}
+{% endif %}
+srv-host={{h.name}}{% if h.target is defined %},{{h.target}}{% endif %}{% if h.port is defined %},{{h.port}}{% endif %}{% if h.priority is defined %},{{h.priority}}{% endif %}{% if h.weight is defined %},{{h.weight}}{% endif %}
 
 # Change the following lines if you want dnsmasq to serve SRV
 # records.  These are useful if you want to serve ldap requests for
@@ -878,42 +861,34 @@ dnsmasq_configure_selfmx: True
 
 # A SRV record sending LDAP for the example.com domain to
 # ldapserver.example.com port 389
-dnsmasq_configure_src_hosts:
-  - name: _ldap._tcp.example.com
-    target: ldapserver.example.com
-    port: 389
+#srv-host=_ldap._tcp.example.com,ldapserver.example.com,389
 
 # A SRV record sending LDAP for the example.com domain to
 # ldapserver.example.com port 389 (using domain=)
-dnsmasq_configure_src_hosts:
-  - domain: example.com
-    name: _ldap._tcp
-    target: ldapserver.example.com
-    port: 389
+#domain=example.com
+#srv-host=_ldap._tcp,ldapserver.example.com,389
 
 # Two SRV records for LDAP, each with different priorities
-dnsmasq_configure_src_hosts:
-  - name: _ldap._tcp.example.com
-    target: ldapserver.example.com
-    port: 389
-    priority: 1
-  - name: _ldap._tcp.example.com
-    target: ldapserver.example.com
-    port: 389
-    priority: 2
+#srv-host=_ldap._tcp.example.com,ldapserver.example.com,389,1
+#srv-host=_ldap._tcp.example.com,ldapserver.example.com,389,2
 
 # A SRV record indicating that there is no LDAP server for the domain
 # example.com
-dnsmasq_configure_src_hosts:
-  - name: _ldap._tcp.example.com
+#srv-host=_ldap._tcp.example.com
+
+{% for p in dnsmasq_configure_ptr_records %}
+ptr-record={{p.name}},{{p.val|to_json}}
+{% endfor %}
 
 # The following line shows how to make dnsmasq serve an arbitrary PTR
 # record. This is useful for DNS-SD. (Note that the
 # domain-name expansion done for SRV records _does_not
 # occur for PTR records.)
-dnsmasq_configure_ptr_records:
-  - name: _http._tcp.dns-sd-services
-    val: New Employee Page._http._tcp.dns-sd-services
+#ptr-record=_http._tcp.dns-sd-services,"New Employee Page._http._tcp.dns-sd-services"
+
+{% for t in dnsmasq_configure_txt_records %}
+txt-record={{t.name}}{% for v in t.vals|default([]) %},{{v|to_json}}{% endfor %}
+{% endfor %}
 
 # Change the following lines to enable dnsmasq to serve TXT records.
 # These are used for things like SPF and zeroconf. (Note that the
@@ -921,78 +896,52 @@ dnsmasq_configure_ptr_records:
 # occur for TXT records.)
 
 #Example SPF.
-dnsmasq_configure_txt_records:
-  - name: example.com
-    vals:
-      - v=spf1 a -all
+#txt-record=example.com,"v=spf1 a -all"
 
 #Example zeroconf
-dnsmasq_configure_txt_records:
-  - name: _http._tcp.example.com
-    vals:
-      - name=value
-      - paper=A4
+#txt-record=_http._tcp.example.com,name=value,paper=A4
+
+{% for cn in dnsmasq_configure_cnames|default([]) %}
+cname={{cn.local}},{{cn.alias}}
+{% endfor %}
 
 # Provide an alias for a "local" DNS name. Note that this _only_ works
 # for targets which are names from DHCP or /etc/hosts. Give host
 # "bert" another name, bertrand
-dnsmasq_configure_cnames:
-  - local: bertand
-    alias: bert
+#cname=bertand,bert
 
 # For debugging purposes, log each DNS query as it passes through
 # dnsmasq.
-dnsmasq_configure_log_queries: True
+{% if dnsmasq_configure_log_queries|default(False) %}
+log-queries
+{% else %}
+#log-queries
+{% endif %}
 
 # Log lots of extra information about DHCP transactions.
-dnsmasq_configure_log_dhcp: True
+{% if dnsmasq_configure_log_dhcp|default(False) %}
+log-dhcp
+{% else %}
+#log-dhcp
+{% endif %}
+
+{% for f in dnsmasq_configure_conf_files %}
+conf-file={{f}}
+{% endfor %}
+
+{% for d in dnsmasq_configure_conf_dirs %}
+conf-dir={{d.d}}{% for i in d.includes|default([]) %},*{{i}}{% endfor %}{% for x in d.excludes|default([]) %},{{x}}{% endfor %}
+{% endfor %}
 
 # Include another lot of configuration options.
-dnsmasq_configure_conf_files:
-  - /etc/dnsmasq.more.conf
-dnsmasq_configure_conf_dirs:
-  - d: /etc/dnsmasq.d
+#conf-file=/etc/dnsmasq.more.conf
+#conf-dir=/etc/dnsmasq.d
 
 # Include all the files in a directory except those ending in .bak
-dnsmasq_configure_conf_dirs:
-  - d: /etc/dnsmasq.d
-    excepts:
-      - .bak
+#conf-dir=/etc/dnsmasq.d,.bak
 
 # Include all files in a directory which end in .conf
-dnsmasq_configure_conf_dirs:
-  - d: /etc/dnsmasq.d/
-    includes:
-      - .conf
+#conf-dir=/etc/dnsmasq.d/,*.conf
 
 # Include all files in /etc/dnsmasq.d except RPM backup files
-dnsmasq_configure_conf_dirs:
-  - d: /etc/dnsmasq.d
-    excepts:
-      - .rpmnew
-      - .rpmsave
-      - .rpmorig
-
-dnsmasq_configure_dhcp_rules:
-  - t: userclass
-    s: set:ipxe,iPXE
-  - t: boot
-    s: tag:ipxe,http://matchbox.drewfus.org:8080/boot.ipxe
-  - t: match
-    s: set:efi64,60,PXEClient:Arch:00007
-  - t: match
-    s: set:efi64,60,PXEClient:Arch:00009
-  - t: boot
-    s: tag:efi64,tag:#ipxe,ipxe.efi
-  - t: match
-    s: set:bios,60,PXEClient:Arch:00000
-  - t: boot
-    s: tag:bios,tag:#ipxe,undionly.kpxe
-  - t: host
-    s: '85:51:fb:46:d9:6f,172.16.0.2'
-  - t: host
-    s: '78:f2:9e:90:47:9b,172.16.0.3'
-  - t: host
-    s: '78:f2:9e:90:47:99,172.16.0.4'
-
-dnsmasq_configure_dhcp_log: True
+#conf-dir=/etc/dnsmasq.d,.rpmnew,.rpmsave,.rpmorig

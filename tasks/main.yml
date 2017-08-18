@@ -1,8 +1,11 @@
 ---
-- name: templatize DNS redirects...
+- name: templatize configuration...
   become: yes
   become_user: root
-  when: dnsmasq_domain_redirects is defined
+  with_items:
+    - f: dnsmasq.conf
+      d: /etc
   template:
-    src: dns_domain_redirect.j2
-    dest: '{{dnsmasq_dropins_dir}}/{{dnsmasq_domain_redirects_prefix|default("")}}dns-domain-redirects'
+    src: '{{item.f}}.j2'
+    dest: '{{item.d}}/{{item.f}}'
+    mode: '{{item.m|default("0644")}}'
