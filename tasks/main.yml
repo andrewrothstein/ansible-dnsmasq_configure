@@ -1,11 +1,17 @@
 ---
-- name: templatize configuration...
+- name: templatize dnsmasq configuration...
   become: yes
   become_user: root
-  with_items:
-    - f: dnsmasq.conf
-      d: /etc
   template:
-    src: '{{item.f}}.j2'
-    dest: '{{item.d}}/{{item.f}}'
-    mode: '{{item.m|default("0644")}}'
+    src: dnsmasq.conf.j2
+    dest: '{{ dnsmasq_configure_conf_dir | default("/etc") }}/{{ dnsmasq_configure_conf_filename | default("dnsmasq.conf") }}'
+    mode: '{{ item.m | default("0644") }}'
+- name: activate dnsmasq service
+  become: yes
+  become_user: root
+  when: dnsmasq_activate | bool | default(True)
+  service:
+    name: dnsmasq
+    state: started
+    enabled: yes
+    

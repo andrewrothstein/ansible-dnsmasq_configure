@@ -24,4 +24,4 @@ galaxy_info:
 
 dependencies:
   - src: andrewrothstein.dnsmasq
-    version: v2.0.0
+    version: v2.0.1

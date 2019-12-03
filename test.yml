@@ -1,21 +1,45 @@
-
 ---
 - hosts: all
   roles:
-    - role: '{{playbook_dir}}'
+    - role: '{{ playbook_dir }}'
       dnsmasq_activate: False
-      dnsmasq_domain_redirects_prefix: '15-'
-      dnsmasq_domain_redirects:
-        - name: consul
-          dns:
-            domain : consul
-            upstream : '127.0.0.1'
-            port : 8600
-            rev_server_cidrs:
-              - '0.0.0.0/8'
-        - name: mesos
-          dns:
-            domain : mesos
-            upstream : '127.0.0.1'
-            port : 8053
-      
+      dnsmasq_configure_interfaces:
+        - eth0
+      dnsmasq_configure_addresses:
+        matchbox.drewfus.org: '172.16.0.1'
+      dnsmasq_configure_listen_addresses:
+        - '172.16.0.1'
+        - '127.0.0.1'
+        - '[::1]'
+      dnsmasq_configure_dhcp_userclasses:
+        - set: ipxe
+          includes: iPXE
+      dnsmasq_configure_dhcp_boots:
+        - tag: ipxe
+          file: http://matchbox.drewfus.org:8080/boot.ipxe
+        - tag:
+            - efi64
+            - #ipxe
+          file: ipxe.efi
+        - tags:
+            - bios
+            - #ipxe
+          file: undionly.kpxe
+      dnsmasq_configure_dhcp_matches:
+        - set: efi64
+          opt: 60
+          val: PXEClient:Arch:00007
+        - set: efi64
+          opt: 60
+          val: PXEClient:Arch:00009
+        - set: bios
+          opt: 60
+          val: PXEClient:Arch:00000
+      dnsmasq_configure_dhcp_hosts:
+        - mac: '85:51:fb:46:d9:6f'
+          ip: '172.16.0.2'
+        - mac: '78:f2:9e:90:47:9b'
+          ip: '172.16.0.3'
+        - mac: '78:f2:9e:90:47:99'
+          ip: '172.16.0.4'
+      dnsmasq_configure_log_dhcp: True
