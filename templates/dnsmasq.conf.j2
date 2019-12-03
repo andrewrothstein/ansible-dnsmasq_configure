@@ -57,7 +57,7 @@ address=/{{ h }}/{{ i }}
 {%- endif -%}
 
 {%- for s in dnsmasq_configure_ipsets | default([]) -%}
-ipset={% s.domains | join('/')}}/{{ s.sets | join(',')}}
+ipset={{ s.domains | join('/') }}/{{ s.sets | join(',')}}
 {%- endfor -%}
 
 {%- for s in dnsmasq_configure_talks | default([]) -%}
@@ -76,7 +76,7 @@ group={{ dnsmasq_configure_group }}
 interface={{ i }}
 {%- endfor -%}
 
-{%- for ei in dnsmasq_configure_except_interfaces | default([]) %}
+{%- for ei in dnsmasq_configure_except_interfaces | default([]) -%}
 except-interface={{ ei }}
 {%- endfor -%}
 
@@ -105,7 +105,7 @@ expand-hosts
 {%- endif -%}
 
 {%- for d in dnsmasq_configure_domains | default([]) -%}
-domain={{ d.domain }}{% if d.subnet is defined %},{{ d.subnet }}{% elsif d.range is defined %},{{ d.range.from }},{{ d.range.to }}{% endif %}
+domain={{ d.domain }}{% if d.subnet is defined %},{{ d.subnet }}{% elif d.range is defined %},{{ d.range.from }},{{ d.range.to }}{% endif %}
 {%- endfor -%}
 
 {%- for r in dnsmasq_configure_dhcp_ranges | default([]) -%}
@@ -144,11 +144,11 @@ read-ethers
 {%- endif -%}
 
 {%- for o in dnsmasq_configure_dhcp_options | default([]) -%}
-dhcp-option{% if o.force | default(False) %}-force{% endif %}={% if o.tag is defined %}{{ o.tag }},{% endif %}{{ o.opt }},{% if o.val is defined %}{{ o.val }}{% elsif o.vals is defined %}{{ o.vals | join(",") }}{% endif %}
+dhcp-option{% if o.force | default(False) %}-force{% endif %}={% if o.tag is defined %}{{ o.tag }},{% endif %}{{ o.opt }},{% if o.val is defined %}{{ o.val }}{% elif o.vals is defined %}{{ o.vals | join(",") }}{% endif %}
 {%- endfor -%}
 
 {%- for b in dnsmasq_configure_dhcp_boots | default([]) -%}
-dhcp-boot={% if b.tag is defined -%}tag:{{ b.tag }},{% elsif b.tags is defined %}{% for t in b.tags %}tag:{{ t }},{% endfor %}{% endif %}{{ b.file }}{% if b.tftp_servername is defined %},{{ b.tftp_servername }}{% endif %}{% for sn in b.tftp_servernames | default([]) %},{{ sn }}{% endfor %}
+dhcp-boot={% if b.tag is defined -%}tag:{{ b.tag }},{% elif b.tags is defined %}{% for t in b.tags %}tag:{{ t }},{% endfor %}{% endif %}{{ b.file }}{% if b.tftp_servername is defined %},{{ b.tftp_servername }}{% endif %}{% for sn in b.tftp_servernames | default([]) %},{{ sn }}{% endfor %}
 {%- endfor -%}
 
 {%- for m in dnsmasq_configure_dhcp_matches | default([]) -%}
