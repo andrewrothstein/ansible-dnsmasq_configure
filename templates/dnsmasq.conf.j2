@@ -112,7 +112,8 @@ domain={{ d.domain }}{% if d.subnet is defined %},{{ d.subnet }}{% elif d.range 
 {%- if r.subnet is defined -%}
 dhcp-range={{ r.subnet }}{% if r.static | default(False) %},static{% endif %}{% if r.ra_only | default(False) %},ra-only{% endif %}{% if r.ra_stateless | default(False) %},ra-stateless{% endif %}{% if r.ra_names | default(False) %}, ra-names{% endif %}{% if r.duration is defined %},{{ r.duration }}{% endif %}
 {%- else -%}
-dhcp-range={% if r.set is defined %}set:{{ r.set }}{% endif %}{ r.range.from }},{{ r.range.to }}{% if r.slaac | default(False) %},slaac{% endif %}{% if r.netmask is defined %},{{ r.netmask }}{% endif %}{% if r.prefix is defined %},{{ r.prefix }}{% endif %}{{% if r.duration is defined},{{ r.duration }}{% endif %}
+dhcp-range={% if r.set is defined %}set:{{ r.set }},{% endif %}{{ r.range.from }},{{ r.range.to }}{% if r.slaac | default(False) %},slaac{% endif %}{% if r.netmask is defined %},{{ r.netmask }}{% endif %}{% if r.prefix is defined %},{{ r.prefix }}{% endif %}{% if r.duration is defined %},{{ r.duration }}{% endif %}
+{%- endif -%}
 {%- endfor -%}
 
 {%- if dnsmasq_configure_enable_ra | default(False) -%}
@@ -159,7 +160,7 @@ dhcp-match={% if m.set is defined %}set:{{ m.set }}{% else %}{{ m.opt }}{% endif
 pxe-prompt={{ pp.prompt | to_json }}{% if pp.wait is defined %},{{ pp.wait }}{% endif %}
 {%- endfor -%}
 
-{%- for ps in dnsmasq_configure_pxe_services -%}
+{%- for ps in dnsmasq_configure_pxe_services | default([]) -%}
 pxe-service={{ ps.id }},{{ ps.name | to_json }}{% if ps.image is defined %},{{ ps.image }}{% endif %}{% if ps.tftp_server is defined %},{{ ps.tftp_server }}{% endif %}
 {%- endfor -%}
 
