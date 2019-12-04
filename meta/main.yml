@@ -21,7 +21,8 @@ galaxy_info:
         - all
   galaxy_tags:
     - development
+  role_name: dnsmasq_configure
 
 dependencies:
-  - src: andrewrothstein.dnsmasq
+  - role: andrewrothstein.dnsmasq
     version: v2.0.1

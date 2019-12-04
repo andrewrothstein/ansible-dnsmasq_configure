@@ -1,7 +1,8 @@
-username.rolename
+andrewrothstein.dnsmasq_configure
 =========
+[![Build Status](https://travis-ci.org/andrewrothstein/ansible-dnsmasq_configure.svg?branch=master)](https://travis-ci.org/andrewrothstein/ansible-dnsmasq_configure)
 
-A brief description of the username.rolename goes here.
+A brief description of the andrewrothstein.dnsmasq_configure goes here.
 
 Requirements
 ------------
@@ -24,7 +25,8 @@ Example Playbook
 ```yml
 - hosts: servers
   roles:
-    - username.rolename
+    - role: andrewrothstein.dnsmasq_configure
+      ...
 ```
 
 License
