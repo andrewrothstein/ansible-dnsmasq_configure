@@ -71,6 +71,17 @@
 #  - domain: '3.168.192.in-addr.arpa'
 #    ip: 10.1.2.3
 
+# configure reverse servers
+#dnsmasq_configure_rev_servers:
+#  subnet: 10.0.0.0/8
+#  nameserver: 127.0.0.1#8600
+
+#dnsmasq_configure_rev_servers:
+#  subnets:
+#    - 0.0.0.0/8
+#    - 10.0.0.0/8
+#  nameserver: 127.0.0.1#8600
+
 # Add local-only domains here, queries in these domains are answered
 # from /etc/hosts or DHCP only.
 #dnsmasq_configure_locals:

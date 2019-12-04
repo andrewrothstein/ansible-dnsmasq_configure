@@ -46,6 +46,16 @@ no-poll
 server=/{{ server.domain }}/{{ server.ip }}
 {%- endfor -%}
 
+{%- for rs in dnsmasq_configure_rev_servers | default([]) -%}
+  {%- if "subnet" in rs -%}
+rev-server=/{{ rs.subnet }}/{{ rs.nameserver }}
+  {%- elif "subnets" in rs -%}
+    {%- for s in rs.subnets -%}
+rev-server=/{{ s }}/{{ rs.nameserver }}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endfor -%}
+
 {%- for d in dnsmasq_configure_locals | default([]) -%}
 local=/{{ d }}/
 {%- endfor -%}

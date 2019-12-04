@@ -16,6 +16,21 @@
           range:
             from: 172.16.0.1
             to: 172.16.254.254
+      dnsmasq_configure_servers:
+        - domain: consul
+          ip: 127.0.0.1#8600
+      dnsmasq_configure_rev_servers:
+        - nameserver: 127.0.0.1#8600
+          subnets:
+            - 0.0.0.0/8
+            - 10.0.0.0/8
+            - 100.64.0.0/10
+            - 127.0.0.1/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+            - 224.0.0.0/4
+            - 240.0.0.0/4
       dnsmasq_configure_dhcp_userclasses:
         - set: ipxe
           includes: iPXE
