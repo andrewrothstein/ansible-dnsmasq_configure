@@ -1,2 +1,9 @@
 ---
 # handlers file for dnsmasq-configure
+- name: dnsmasq_configure_restart
+  become: yes
+  become_user: root
+  when: dnsmasq_activate | default(True)
+  service:
+    name: dnsmasq
+    state: restarted

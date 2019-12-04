@@ -2,6 +2,7 @@
 - name: templatize dnsmasq configuration...
   become: yes
   become_user: root
+  notify: dnsmasq_configure_restart
   template:
     src: dnsmasq.conf.j2
     dest: '{{ dnsmasq_configure_conf_dir | default("/etc") }}/{{ dnsmasq_configure_conf_filename | default("dnsmasq.conf") }}'
