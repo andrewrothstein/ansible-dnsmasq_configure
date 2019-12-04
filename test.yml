@@ -37,13 +37,13 @@
       dnsmasq_configure_dhcp_boots:
         - tag: ipxe
           file: http://matchbox.drewfus.org:8080/boot.ipxe
-        - tag:
+        - tags:
             - efi64
-            - #ipxe
+            - '#ipxe'
           file: ipxe.efi
         - tags:
             - bios
-            - #ipxe
+            - '#ipxe'
           file: undionly.kpxe
       dnsmasq_configure_dhcp_matches:
         - set: efi64
@@ -57,11 +57,11 @@
           val: PXEClient:Arch:00000
       dnsmasq_configure_dhcp_hosts:
         - mac: '85:51:fb:46:d9:6f'
-          ip: '172.16.0.2'
+          address: '172.16.0.2'
         - mac: '78:f2:9e:90:47:9b'
-          ip: '172.16.0.3'
+          address: '172.16.0.3'
         - mac: '78:f2:9e:90:47:99'
-          ip: '172.16.0.4'
+          address: '172.16.0.4'
       dnsmasq_configure_log_dhcp: True
       dnsmasq_configure_dhcp_ranges:
         - range:

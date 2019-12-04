@@ -308,7 +308,7 @@
 # The IP address 192.168.0.60
 #dnsmasq_configure_dhcp_hosts:
 #  - mac: '11:22:33:44:55:66'
-#    ip: '192.168.0.60'
+#    address: '192.168.0.60'
 
 # Always set the name of the host with hardware address
 # 11:22:33:44:55:66 to be "fred"
@@ -323,18 +323,6 @@
 #    host: fred
 #    address: '192.168.0.60'
 #    duration: '45m'
-
-# Give a host with Ethernet address 11:22:33:44:55:66 or
-# 12:34:56:78:90:12 the IP address 192.168.0.60. Dnsmasq will assume
-# that these two Ethernet interfaces will never be in use at the same
-# time, and give the IP address to the second, even if it is already
-# in use by the first. Useful for laptops with wired and wireless
-# addresses.
-#dnsmasq_configure_dhcp_hosts:
-#  - macs:
-#      - '11:22:33:44:55:66'
-#      - '12:34:56:78:90:12'
-#    address: '192.168.0.60'
 
 # Give the machine which says its name is "bert" IP address
 # 192.168.0.70 and an infinite lease
@@ -754,7 +742,7 @@
 #dnsmasq_configure_enable_tftp: True
 
 # Set the root directory for files available via FTP.
-dnsmasq_configure_tftp_root: /var/lib/tftpboot
+#dnsmasq_configure_tftp_root: /var/lib/tftpboot
 
 # Do not abort if the tftp-root is unavailable
 #dnsmasq_configure_tftp_no_fail: True

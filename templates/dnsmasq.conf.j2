@@ -1,280 +1,283 @@
-{%- if dnsmasq_configure_port is defined -%}
+{% if dnsmasq_configure_port is defined %}
 port={{ dnsmasq_configure_port }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_domain_needed | default(False) -%}
+{% if dnsmasq_configure_domain_needed | default(False) %}
 domain-needed
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_bogus_priv | default(False) -%}
+{% if dnsmasq_configure_bogus_priv | default(False) %}
 bogus-priv
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_conf_file is defined -%}
+{% if dnsmasq_configure_conf_file is defined %}
 conf-file={{ dnsmasq_configure_conf_file }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_dnssec | default(False) -%}
+{% if dnsmasq_configure_dnssec | default(False) %}
 dnssec
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_dnssec_check_unsigned | default(False) -%}
+{% if dnsmasq_configure_dnssec_check_unsigned | default(False) %}
 dnssec-check-unsigned
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_filterwin2k | default(False) -%}
+{% if dnsmasq_configure_filterwin2k | default(False) %}
 filterwin2k
-{%- endif %}
+{% endif %}
 
-{%- if dnsmasq_configure_resolv_file | default(False) -%}
+{% if dnsmasq_configure_resolv_file | default(False) %}
 resolv-file={{ dnsmasq_configure_resolv_file }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_strict_order | default(False) -%}
+{% if dnsmasq_configure_strict_order | default(False) %}
 strict-order
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_no_resolv | default(False) -%}
+{% if dnsmasq_configure_no_resolv | default(False) %}
 no-resolv
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_no_poll | default(False) -%}
+{% if dnsmasq_configure_no_poll | default(False) %}
 no-poll
-{%- endif -%}
+{% endif %}
 
-{%- for server in dnsmasq_configure_servers | default([]) -%}
+{% for server in dnsmasq_configure_servers | default([]) %}
 server=/{{ server.domain }}/{{ server.ip }}
-{%- endfor -%}
 
-{%- for rs in dnsmasq_configure_rev_servers | default([]) -%}
-  {%- if "subnet" in rs -%}
-rev-server=/{{ rs.subnet }}/{{ rs.nameserver }}
-  {%- elif "subnets" in rs -%}
-    {%- for s in rs.subnets -%}
-rev-server=/{{ s }}/{{ rs.nameserver }}
-    {%- endfor -%}
-  {%- endif -%}
-{%- endfor -%}
+{% endfor %}
 
-{%- for d in dnsmasq_configure_locals | default([]) -%}
+{% for rs in dnsmasq_configure_rev_servers | default([]) %}
+{% if "subnet" in rs %}
+rev-server={{ rs.subnet }},{{ rs.nameserver }}
+{% elif "subnets" in rs %}
+{% for s in rs.subnets %}
+rev-server={{ s }},{{ rs.nameserver }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{% for d in dnsmasq_configure_locals | default([]) %}
 local=/{{ d }}/
-{%- endfor -%}
+{% endfor %}
 
-{%- if dnsmasq_configure_addresses is defined -%}
-{%- for h, i in dnsmasq_configure_addresses.items() -%}
+{% if dnsmasq_configure_addresses is defined %}
+{% for h, i in dnsmasq_configure_addresses.items() %}
 address=/{{ h }}/{{ i }}
-{%- endfor -%}
-{%- endif -%}
+{% endfor %}
+{% endif %}
 
-{%- for s in dnsmasq_configure_ipsets | default([]) -%}
+{% for s in dnsmasq_configure_ipsets | default([]) %}
 ipset={{ s.domains | join('/') }}/{{ s.sets | join(',')}}
-{%- endfor -%}
+{% endfor %}
 
-{%- for s in dnsmasq_configure_talks | default([]) -%}
+{% for s in dnsmasq_configure_talks | default([]) %}
 server={{ s.server }}@{{ s.target }}{% if "port" in s %}#{{ s.port }}{% endif %}
-{%- endfor -%}
+{% endfor %}
 
-{%- if dnsmasq_configure_user is defined -%}
+{% if dnsmasq_configure_user is defined %}
 user={{ dnsmasq_configure_user }}
-{%- endif %}
+{% endif %}
 
-{%- if dnsmasq_configure_group is defined -%}
+{% if dnsmasq_configure_group is defined %}
 group={{ dnsmasq_configure_group }}
-{%- endif -%}
+{% endif %}
 
-{%- for i in dnsmasq_configure_interfaces | default([]) -%}
+{% for i in dnsmasq_configure_interfaces | default([]) %}
 interface={{ i }}
-{%- endfor -%}
+{% endfor %}
 
-{%- for ei in dnsmasq_configure_except_interfaces | default([]) -%}
+{% for ei in dnsmasq_configure_except_interfaces | default([]) %}
 except-interface={{ ei }}
-{%- endfor -%}
+{% endfor %}
 
-{%- for a in dnsmasq_configure_listen_addresses | default([]) -%}
+{% for a in dnsmasq_configure_listen_addresses | default([]) %}
 listen-address={{ a }}
-{%- endfor -%}
+{% endfor %}
 
-{%- for i in dnsmasq_configure_no_dhcp_interfaces | default([]) -%}
+{% for i in dnsmasq_configure_no_dhcp_interfaces | default([]) %}
 no-dhcp-interface={{ i }}
-{%- endfor -%}
+{% endfor %}
 
-{%- if dnsmasq_configure_bind_interfaces | default(False) -%}
+{% if dnsmasq_configure_bind_interfaces | default(False) %}
 bind-interfaces
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_no_hosts | default(False) -%}
+{% if dnsmasq_configure_no_hosts | default(False) %}
 no-hosts
-{%- endif -%}
+{% endif %}
 
-{%- for hf in dnsmasq_configure_addn_hosts | default([]) -%}
+{% for hf in dnsmasq_configure_addn_hosts | default([]) %}
 addn-hosts={{ hf }}
-{%- endfor -%}
+{% endfor %}
 
-{%- if dnsmasq_configure_expand_hosts | default(False) -%}
+{% if dnsmasq_configure_expand_hosts | default(False) %}
 expand-hosts
-{%- endif -%}
+{% endif %}
 
-{%- for d in dnsmasq_configure_domains | default([]) -%}
+{% for d in dnsmasq_configure_domains | default([]) %}
 domain={{ d.domain }}{% if "subnet" in d %},{{ d.subnet }}{% elif "range" in d %},{{ d["range"]["from"] }},{{ d["range"]["to"] }}{% endif %}
-{%- endfor -%}
+{% endfor %}
 
-{%- for r in dnsmasq_configure_dhcp_ranges | default([]) -%}
-{%- if "subnet" in r -%}
+{% for r in dnsmasq_configure_dhcp_ranges | default([]) %}
+{% if "subnet" in r %}
 dhcp-range={{ r.subnet }}{% if "static" in r %},static{% endif %}{% if "ra_only" in r %},ra-only{% endif %}{% if "ra_stateless" in r %},ra-stateless{% endif %}{% if "ra_names" in r %}, ra-names{% endif %}{% if "duration" in r %},{{ r.duration }}{% endif %}
-{%- else -%}
+{% else %}
 dhcp-range={% if "set" in r %}set:{{ r.set }},{% endif %}{{ r["range"]["from"] }},{{ r["range"]["to"] }}{% if "slaac" in r %},slaac{% endif %}{% if "netmask" in r %},{{ r.netmask }}{% endif %}{% if "prefix" in r %},{{ r.prefix }}{% endif %}{% if "duration" in r %},{{ r.duration }}{% endif %}
-{%- endif -%}
-{%- endfor -%}
+{% endif %}
+{% endfor %}
 
-{%- if dnsmasq_configure_enable_ra | default(False) -%}
+{% if dnsmasq_configure_enable_ra | default(False) %}
 enable-ra
-{%- endif -%}
+{% endif %}
 
-{%- for h in dnsmasq_configure_dhcp_hosts | default([]) -%}
-dhcp-host={% if "macs" in h %}{{ h.macs | join(",") }}{% else %}{{ h.mac }}{% endif %}{% if "host" in h %},{{ h.host }}{% endif %}{% if "address" in h %},{{ h.address }}{% endif %}{% if "ipv6" in h %},[{{ h.ipv6 }}]{% endif %}{% if "duration" in h %},{{ h.duration }}{% endif %}{% if "infinite" in h %},infinite{% endif %}{% if "ignore" in h %},ignore{% endif %}{% if "ignore_all" in h %},id:*{% endif %}{% if "set" in h %},set:{{ h.set }}{% endif %}
-{%- endfor -%}
+{% for h in dnsmasq_configure_dhcp_hosts | default([]) %}
+dhcp-host={{ h.mac }}{% if "host" in h %},{{ h.host }}{% endif %}{% if "address" in h %},{{ h.address }}{% endif %}{% if "ipv6" in h %},[{{ h.ipv6 }}]{% endif %}{% if "duration" in h %},{{ h.duration }}{% endif %}{% if "infinite" in h and h["infinite"] | bool %},infinite{% endif %}{% if "ignore" in h and h["ignore"] | bool %},ignore{% endif %}{% if "ignore_all" in h and h["ignore_all"] | bool %},id:*{% endif %}{% if "set" in h %},set:{{ h.set }}{% endif %}
 
-{%- if dnsmasq_configure_dhcp_ignore_tag is defined -%}
+{% endfor %}
+
+{% if dnsmasq_configure_dhcp_ignore_tag is defined %}
 dhcp-ignore=tag:{{ dnsmasq_configure_dhcp_ignore_tag }}
-{%- endif -%}
+{% endif %}
 
-{%- for vc in dnsmasq_configure_dhcp_vendor_classes | default([]) -%}
+{% for vc in dnsmasq_configure_dhcp_vendor_classes | default([]) %}
 dhcp-vendorclass=set:{{ vc.set }},{{ vc.includes }}
-{%- endfor -%}
+{% endfor %}
 
-{%- for uc in dnsmasq_configure_dhcp_user_classes | default([]) -%}
+{% for uc in dnsmasq_configure_dhcp_user_classes | default([]) %}
 dhcp-userclass=set:{{ uc.set }},{{ uc.includes }}
-{%- endfor -%}
+{% endfor %}
 
-{%- for m in dnsmasq_configure_dhcp_macs | default([]) -%}
+{% for m in dnsmasq_configure_dhcp_macs | default([]) %}
 dhcp-mac=set:{{ m.set }},{{ m.mac_pattern }}
-{%- endfor -%}
+{% endfor %}
 
-{%- if dnsmasq_configure_read_ethers | default(False) -%}
+{% if dnsmasq_configure_read_ethers | default(False) %}
 read-ethers
-{%- endif -%}
+{% endif %}
 
-{%- for o in dnsmasq_configure_dhcp_options | default([]) -%}
+{% for o in dnsmasq_configure_dhcp_options | default([]) %}
 dhcp-option{% if "force" in o and o.force | bool %}-force{% endif %}={% if "tag" in o %}{{ o.tag }},{% endif %}{{ o.opt }},{% if "val" in o %}{{ o.val }}{% elif "vals" in o %}{{ o.vals | join(",") }}{% endif %}
-{%- endfor -%}
+{% endfor %}
 
-{%- for b in dnsmasq_configure_dhcp_boots | default([]) -%}
-dhcp-boot={% if "tag" in b -%}tag:{{ b.tag }},{% elif "tags" in b %}{% for t in b.tags %}tag:{{ t }},{% endfor %}{% endif %}{{ b.file }}{% if "tftp_servername" in b %},{{ b.tftp_servername }}{% endif %}{% if "tftp_servernames" in b %}{% for sn in b.tftp_servernames | default([]) %},{{ sn }}{% endfor %}{% endif %}
-{%- endfor -%}
+{% for b in dnsmasq_configure_dhcp_boots | default([]) %}
+dhcp-boot={% if "tag" in b %}tag:{{ b.tag }},{% elif "tags" in b %}{% for t in b.tags %}tag:{{ t }},{% endfor %}{% endif %}{{ b.file }}{% if "tftp_servername" in b %},{{ b.tftp_servername }}{% endif %}{% if "tftp_servernames" in b %}{% for sn in b.tftp_servernames | default([]) %},{{ sn }}{% endfor %}{% endif %}
 
-{%- for m in dnsmasq_configure_dhcp_matches | default([]) -%}
+{% endfor %}
+
+{% for m in dnsmasq_configure_dhcp_matches | default([]) %}
 dhcp-match={% if "set" in m %}set:{{ m.set }}{% else %}{{ m.opt }}{% endif %},{{ m.val }}
-{%- endfor -%}
+{% endfor %}
 
-{%- for pp in dnsmasq_configure_pxe_prompts | default([]) -%}
+{% for pp in dnsmasq_configure_pxe_prompts | default([]) %}
 pxe-prompt={{ pp.prompt | to_json }}{% if "wait" in pp %},{{ pp.wait }}{% endif %}
-{%- endfor -%}
+{% endfor %}
 
-{%- for ps in dnsmasq_configure_pxe_services | default([]) -%}
+{% for ps in dnsmasq_configure_pxe_services | default([]) %}
 pxe-service={{ ps.id }},{{ ps.name | to_json }}{% if "image" in ps %},{{ ps.image }}{% endif %}{% if "tftp_server" in ps %},{{ ps.tftp_server }}{% endif %}
-{%- endfor -%}
+{% endfor %}
 
-{%- if dnsmasq_configure_enable_tftp | default(False) -%}
+{% if dnsmasq_configure_enable_tftp | default(False) %}
 enable-tftp
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_tftp_root is defined -%}
+{% if dnsmasq_configure_tftp_root is defined %}
 tftp-root={{ dnsmasq_configure_tftp_root }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_tftp_no_fail | default(False) -%}
+{% if dnsmasq_configure_tftp_no_fail | default(False) %}
 tftp-no-fail
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_tftp_secure | default(False) -%}
+{% if dnsmasq_configure_tftp_secure | default(False) %}
 tftp-secure
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_tftp_no_blocksize | default(False) -%}
+{% if dnsmasq_configure_tftp_no_blocksize | default(False) %}
 tftp-no-blocksize
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_dhcp_lease_max is defined -%}
+{% if dnsmasq_configure_dhcp_lease_max is defined %}
 dhcp-lease-max={{ dnsmasq_configure_dhcp_lease_max }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_dhcp_leasefile is defined -%}
+{% if dnsmasq_configure_dhcp_leasefile is defined %}
 dhcp-leasefile={{ dnsmasq_configure_dhcp_leasefile }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_dhcp_authoritative | default(False) -%}
+{% if dnsmasq_configure_dhcp_authoritative | default(False) %}
 dhcp-authoritative
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_dhcp_script is defined -%}
+{% if dnsmasq_configure_dhcp_script is defined %}
 dhcp-script={{ dnsmasq_configure_dhcp_script }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_cache_size is defined -%}
+{% if dnsmasq_configure_cache_size is defined %}
 cache-size={{ dnsmasq_configure_cache_size }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_no_negcache | default(False) -%}
+{% if dnsmasq_configure_no_negcache | default(False) %}
 no-negcache
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_local_ttl is defined -%}
+{% if dnsmasq_configure_local_ttl is defined %}
 local-ttl={{ dnsmasq_configure_local_ttl }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_bogus_nxdomain is defined -%}
+{% if dnsmasq_configure_bogus_nxdomain is defined %}
 bogus-nxdomain={{ dnsmasq_configure_bogus_nxdomain }}
-{%- endif %}
+{% endif %}
 
-{%- for a in dnsmasq_configure_aliases | default([]) -%}
+{% for a in dnsmasq_configure_aliases | default([]) %}
 alias={{ a.src }},{{ a.target }}{% if "netmask" in a %},{{ a.netmask }}{% endif %}
-{%- endfor -%}
+{% endfor %}
 
-{%- if dnsmasq_configure_mx_host is defined -%}
+{% if dnsmasq_configure_mx_host is defined %}
 mx-host={{ dnsmasq_configure_mx_host.record }},{{ dnsmasq_configure_mx_host.target }},{{ dnsmasq_configure_mx_host.preference }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_mx_target is defined -%}
+{% if dnsmasq_configure_mx_target is defined %}
 mx-target={{ dnsmasq_configure_mx_target }}
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_localmx | default(False) -%}
+{% if dnsmasq_configure_localmx | default(False) %}
 localmx
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_selfmx | default(False) -%}
+{% if dnsmasq_configure_selfmx | default(False) %}
 selfmx
-{%- endif -%}
+{% endif %}
 
-{%- for h in dnsmasq_configure_srv_hosts | default([]) -%}
-{%- if "domain" in h %}domain={{ h.domain }}{% endif %}
+{% for h in dnsmasq_configure_srv_hosts | default([]) %}
+{% if "domain" in h %}domain={{ h.domain }}{% endif %}
 srv-host={{ h.name }}{% if "target" in h %},{{ h.target }}{% endif %}{% if "port" in h %},{{ h.port }}{% endif %}{% if "priority" in h %},{{ h.priority }}{% endif %}{% if "weight" in h %},{{ h.weight }}{% endif %}
-{%- endfor -%}
+{% endfor %}
 
-{%- for p in dnsmasq_configure_ptr_records | default([]) -%}
+{% for p in dnsmasq_configure_ptr_records | default([]) %}
 ptr-record={{ p.name }},{{ p.val | to_json }}
-{%- endfor -%}
+{% endfor %}
 
-{%- for t in dnsmasq_configure_txt_records | default([]) -%}
+{% for t in dnsmasq_configure_txt_records | default([]) %}
 txt-record={{ t.name }}{% for v in t.vals | default([]) %},{{ v | to_json }}{% endfor %}
-{%- endfor -%}
+{% endfor %}
 
-{%- for cn in dnsmasq_configure_cnames | default([]) -%}
+{% for cn in dnsmasq_configure_cnames | default([]) %}
 cname={{ cn.local }},{{ cn.alias }}
-{%- endfor -%}
+{% endfor %}
 
-{%- if dnsmasq_configure_log_queries | default(False) -%}
+{% if dnsmasq_configure_log_queries | default(False) %}
 log-queries
-{%- endif -%}
+{% endif %}
 
-{%- if dnsmasq_configure_log_dhcp | default(False) %}
+{% if dnsmasq_configure_log_dhcp | default(False) %}
 log-dhcp
-{%- endif -%}
+{% endif %}
 
-{%- for f in dnsmasq_configure_conf_files | default([]) -%}
+{% for f in dnsmasq_configure_conf_files | default([]) %}
 conf-file={{ f }}
-{%- endfor -%}
+{% endfor %}
 
-{%- for d in dnsmasq_configure_conf_dirs | default([]) -%}
+{% for d in dnsmasq_configure_conf_dirs | default([]) %}
 conf-dir={{ d.d }}{% for i in d.includes | default([]) %},*{{ i }}{% endfor %}{% for x in d.excludes|default([]) %},{{ x }}{% endfor %}
-{%- endfor -%}
+{% endfor %}
