@@ -11,6 +11,11 @@
         - '172.16.0.1'
         - '127.0.0.1'
         - '[::1]'
+      dnsmasq_configure_domains:
+        - domain: private.nj.drewfus.org
+          range:
+            from: 172.16.0.1
+            to: 172.16.254.254
       dnsmasq_configure_dhcp_userclasses:
         - set: ipxe
           includes: iPXE
@@ -43,3 +48,9 @@
         - mac: '78:f2:9e:90:47:99'
           ip: '172.16.0.4'
       dnsmasq_configure_log_dhcp: True
+      dnsmasq_configure_dhcp_ranges:
+        - range:
+            from: 172.16.0.10
+            to: 172.16.254.254
+          netmask: 255.255.0.0
+          duration: '15m'
