@@ -9,7 +9,7 @@
 - name: activate dnsmasq service
   become: yes
   become_user: root
-  when: dnsmasq_activate | bool | default(True)
+  when: dnsmasq_activate | default(True)
   service:
     name: dnsmasq
     state: started
