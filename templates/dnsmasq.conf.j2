@@ -158,6 +158,7 @@ read-ethers
 
 {% for o in dnsmasq_configure_dhcp_options | default([]) %}
 dhcp-option{% if "force" in o and o.force | bool %}-force{% endif %}={% if "tag" in o %}{{ o.tag }},{% endif %}{{ o.opt }},{% if "val" in o %}{{ o.val }}{% elif "vals" in o %}{{ o.vals | join(",") }}{% endif %}
+
 {% endfor %}
 
 {% for b in dnsmasq_configure_dhcp_boots | default([]) %}

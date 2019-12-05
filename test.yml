@@ -1,5 +1,7 @@
 ---
 - hosts: all
+  vars:
+    domain: private.nj.drewfus.org
   roles:
     - role: '{{ playbook_dir }}'
       dnsmasq_activate: False
@@ -12,7 +14,7 @@
         - '127.0.0.1'
         - '[::1]'
       dnsmasq_configure_domains:
-        - domain: private.nj.drewfus.org
+        - domain: '{{ domain }}'
           range:
             from: 172.16.0.1
             to: 172.16.254.254
@@ -69,3 +71,10 @@
             to: 172.16.254.254
           netmask: 255.255.0.0
           duration: '15m'
+      dnsmasq_configure_dhcp_options:
+        - opt: option:router
+          val: 172.16.0.1
+        - opt: option:dns-server
+          val: 172.16.0.1
+        - opt: option:domain_name
+          val: '{{ domain }}'
