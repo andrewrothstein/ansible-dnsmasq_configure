@@ -25,6 +25,6 @@ galaxy_info:
 
 dependencies:
   - role: andrewrothstein.dnsmasq
-    version: v2.0.1
-    notify:
-      - disable_systemd-resolved
+    scm: git
+    src: https://github.com/vmichel95/ansible-dnsmasq.git
+    version: bugfix/Enhancing-Ubuntu-Process-to-Remove-Systemd-Resolved-Collisions
