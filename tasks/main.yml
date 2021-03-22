@@ -9,8 +9,13 @@
       skip: true
       paths:
         - '{{ role_path }}/vars'
-- name: trigger installation handler execution
-  meta: flush_handlers
+- name: disable_systemd-resolved
+  become: yes
+  become_user: root
+  service:
+    name: systemd-resolved
+    state: stopped
+    enabled: no
 - name: templatize dnsmasq configuration...
   become: yes
   become_user: root
