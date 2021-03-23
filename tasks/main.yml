@@ -7,12 +7,3 @@
     src: dnsmasq.conf.j2
     dest: '{{ dnsmasq_configure_conf_dir | default("/etc") }}/{{ dnsmasq_configure_conf_filename | default("dnsmasq.conf") }}'
     mode: '{{ item.m | default("0644") }}'
-- name: activate dnsmasq service
-  become: yes
-  become_user: root
-  when: dnsmasq_activate | default(True)
-  service:
-    name: dnsmasq
-    state: started
-    enabled: yes
-    
