@@ -11,6 +11,8 @@
         - '{{ role_path }}/vars'
 - import_role:
     name: andrewrothstein.dnsmasq
+  notify:
+    - disable_systemd_resolved
 - meta: flush_handlers
 - name: templatize dnsmasq configuration...
   become: yes
