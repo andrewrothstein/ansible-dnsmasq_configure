@@ -9,6 +9,11 @@
       skip: true
       paths:
         - '{{ role_path }}/vars'
+- name: Import role
+  import_role:
+    name: andrewrothstein.dnsmasq
+  notify:
+    - disable_systemd_resolved
 - meta: flush_handlers
 - name: templatize dnsmasq configuration...
   become: yes

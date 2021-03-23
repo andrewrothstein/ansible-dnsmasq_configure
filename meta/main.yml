@@ -23,8 +23,4 @@ galaxy_info:
     - development
   role_name: dnsmasq_configure
 
-dependencies:
-  - role: andrewrothstein.dnsmasq
-    version: v2.0.2
-    notify:
-      - disable_systemd_resolved
+dependencies: []
