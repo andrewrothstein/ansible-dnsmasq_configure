@@ -1,2 +1,0 @@
----
-dnsmasq_disable_systemd_resolved: ansible_distribution_version is version('18.04', operator='>=')
