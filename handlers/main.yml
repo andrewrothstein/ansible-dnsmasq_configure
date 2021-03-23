@@ -1,9 +1,9 @@
 ---
 # handlers file for dnsmasq-configure
 - name: dnsmasq_configure_restart
-  become: yes
+  become: '{{ dnsmasq_configure_privilege_escalate }}'
   become_user: root
-  when: dnsmasq_activate | default(True)
+  when: dnsmasq_configure_activate
   service:
     name: dnsmasq
     state: restarted

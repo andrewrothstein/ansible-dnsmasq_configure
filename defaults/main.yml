@@ -1,4 +1,6 @@
 ---
+dnsmasq_configure_activate: True
+dnsmasq_configure_privilege_escalate: True
 # to not activate the dnsmasq service
 #dnsmasq_configure_activate: False
 
