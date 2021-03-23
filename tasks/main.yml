@@ -9,6 +9,14 @@
       skip: true
       paths:
         - '{{ role_path }}/vars'
+- name: disabling the systemd-resolved service
+  become: '{{ dnsmasq_configure_privilege_escalate }}'
+  become_user: root
+  when: dnsmasq_configure_activate and dnsmasq_configure_disable_systemd_resolved and dnsmasq_configure_should_disable_systemd_resolved
+  service:
+    name: systemd-resolved
+    state: stopped
+    enabled: no
 - name: templatize dnsmasq configuration...
   become: '{{ dnsmasq_configure_privilege_escalate }}'
   become_user: root
@@ -16,20 +24,12 @@
   template:
     src: dnsmasq.conf.j2
     dest: '{{ dnsmasq_configure_conf_dir | default("/etc") }}/{{ dnsmasq_configure_conf_filename | default("dnsmasq.conf") }}'
-    mode: '{{ item.m | default("0644") }}'
-- name: post-installation operations
+    mode: '0644'
+- name: enabling the dnsmasq service
   become: '{{ dnsmasq_configure_privilege_escalate }}'
   become_user: root
-  block:
-    - name: disable systemd-resolved service
-      when: dnsmasq_configure_disable_systemd_resolved
-      service:
-        name: systemd-resolved
-        state: stopped
-        enabled: no
-    - name: activate dnsmasq service
-      when: dnsmasq_configure_activate
-      service:
-        name: dnsmasq
-        state: started
-        enabled: yes
+  when: dnsmasq_configure_activate
+  service:
+    name: dnsmasq
+    state: started
+    enabled: yes

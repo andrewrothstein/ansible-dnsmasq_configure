@@ -1,8 +1,12 @@
 ---
-dnsmasq_configure_activate: True
 dnsmasq_configure_privilege_escalate: True
-# to not activate the dnsmasq service
-#dnsmasq_configure_activate: False
+
+# to activate or not the dnsmasq service
+dnsmasq_configure_activate: True
+
+# disable the systemd-resolved service when activating dnsmasq
+# to prevent them from crashing into each other
+dnsmasq_configure_deactivate_systemd_resolved: False
 
 # defaults file for dnsmasq-configure
 #dnsmasq_configure_conf_dir: /etc

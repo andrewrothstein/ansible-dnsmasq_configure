@@ -4,7 +4,7 @@
     domain: private.nj.drewfus.org
   roles:
     - role: '{{ playbook_dir }}'
-      dnsmasq_activate: False
+      dnsmasq_configure_activate: False
       dnsmasq_configure_interfaces:
         - eth0
       dnsmasq_configure_addresses:
