@@ -1,18 +1,35 @@
 ---
+- name: resolve platform specific vars
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - '{{ ansible_os_family }}.yml'
+      skip: true
+      paths:
+        - '{{ role_path }}/vars'
 - name: templatize dnsmasq configuration...
-  become: yes
+  become: '{{ dnsmasq_configure_privilege_escalate }}'
   become_user: root
   notify: dnsmasq_configure_restart
   template:
     src: dnsmasq.conf.j2
     dest: '{{ dnsmasq_configure_conf_dir | default("/etc") }}/{{ dnsmasq_configure_conf_filename | default("dnsmasq.conf") }}'
     mode: '{{ item.m | default("0644") }}'
-- name: activate dnsmasq service
-  become: yes
+- name: post-installation operations
+  become: '{{ dnsmasq_configure_privilege_escalate }}'
   become_user: root
-  when: dnsmasq_activate | default(True)
-  service:
-    name: dnsmasq
-    state: started
-    enabled: yes
-    
+  block:
+    - name: disable systemd-resolved service
+      when: dnsmasq_configure_disable_systemd_resolved
+      service:
+        name: systemd-resolved
+        state: stopped
+        enabled: no
+    - name: activate dnsmasq service
+      when: dnsmasq_configure_activate
+      service:
+        name: dnsmasq
+        state: started
+        enabled: yes
