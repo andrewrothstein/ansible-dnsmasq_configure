@@ -24,7 +24,7 @@ galaxy_info:
   role_name: dnsmasq_configure
 
 dependencies:
-  - role: andrewrothstein.dnsmasq
+  - role: vmichel95.dnsmasq
     scm: git
     src: https://github.com/vmichel95/ansible-dnsmasq.git
     version: bugfix/Enhancing-Ubuntu-Process-to-Remove-Systemd-Resolved-Collisions
