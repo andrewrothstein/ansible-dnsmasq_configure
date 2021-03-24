@@ -6,7 +6,7 @@ dnsmasq_configure_activate: True
 
 # disable the systemd-resolved service when activating dnsmasq
 # to prevent them from crashing into each other
-dnsmasq_configure_deactivate_systemd_resolved: False
+dnsmasq_configure_disable_systemd_resolved: False
 
 # defaults file for dnsmasq-configure
 #dnsmasq_configure_conf_dir: /etc
