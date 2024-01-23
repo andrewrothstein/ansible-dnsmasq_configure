@@ -1,6 +1,9 @@
 ---
-- name: resolve platform specific vars
-  include_vars: '{{ item }}'
+- name: Installing dnsmasq
+  ansible.builtin.include_role:
+    name: andrewrothstein.dnsmasq
+- name: Resolve platform specific vars
+  ansible.builtin.include_vars: '{{ item }}'
   with_first_found:
     - files:
         - '{{ ansible_distribution }}-{{ ansible_distribution_release }}.yml'
@@ -9,27 +12,30 @@
       skip: true
       paths:
         - '{{ role_path }}/vars'
-- name: disabling the systemd-resolved service
+- name: Disabling the systemd-resolved service
   become: '{{ dnsmasq_configure_privilege_escalate }}'
   become_user: root
-  when: dnsmasq_configure_activate and dnsmasq_configure_disable_systemd_resolved and dnsmasq_configure_should_disable_systemd_resolved
-  service:
+  when: >-
+    dnsmasq_configure_activate
+    and dnsmasq_configure_disable_systemd_resolved
+    and dnsmasq_configure_should_disable_systemd_resolved
+  ansible.builtin.service:
     name: systemd-resolved
     state: stopped
-    enabled: no
-- name: templatize dnsmasq configuration...
+    enabled: false
+- name: Templatizing {{ dnsmasq_configure_conf_path }}
   become: '{{ dnsmasq_configure_privilege_escalate }}'
   become_user: root
   notify: dnsmasq_configure_restart
-  template:
+  ansible.builtin.template:
     src: dnsmasq.conf.j2
-    dest: '{{ dnsmasq_configure_conf_dir | default("/etc") }}/{{ dnsmasq_configure_conf_filename | default("dnsmasq.conf") }}'
-    mode: '0644'
-- name: enabling the dnsmasq service
+    dest: '{{ dnsmasq_configure_conf_path }}'
+    mode: '644'
+- name: Enabling the dnsmasq service
   become: '{{ dnsmasq_configure_privilege_escalate }}'
   become_user: root
   when: dnsmasq_configure_activate
-  service:
+  ansible.builtin.service:
     name: dnsmasq
     state: started
-    enabled: yes
+    enabled: true

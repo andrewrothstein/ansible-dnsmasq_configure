@@ -1,3 +1,6 @@
 ---
 # vars file for dnsmasq-configure
-dnsmasq_configure_should_disable_systemd_resolved: False
+dnsmasq_configure_should_disable_systemd_resolved: false
+dnsmasq_configure_conf_path: >-
+  {{ dnsmasq_configure_conf_dir | default("/etc") }}
+  /{{ dnsmasq_configure_conf_filename | default("dnsmasq.conf") -}}
