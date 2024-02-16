@@ -39,51 +39,38 @@ no-resolv
 no-poll
 {% endif %}
 
-{% if dnsmasq_configure_servers is defined %}
-{% for server in dnsmasq_configure_servers %}
-{% if server.domain is defined %}
-server=/{{ server.domain }}/{{ server.ip }}
-{% else %}
-server={{ server.ip }}
-{% endif %}
+{% for server in dnsmasq_configure_servers | default([]) %}
+server=
+{%-  if server.domain is defined %}/{{ server.domain }}/
+{%-  endif %}{{ server.ip }}
 {% endfor %}
-{% endif %}
 
-{% if dnsmasq_configure_rev_servers is defined %}
-{%   for rs in dnsmasq_configure_rev_servers %}
-{%     if rs.subnet is defined %}
+{% for rs in dnsmasq_configure_rev_servers | default([]) %}
+{%   if rs.subnet is defined %}
 rev-server={{ rs.subnet }},{{ rs.nameserver }}
-{%      elif rs.subnets is defined %}
-{%        for s in rs.subnets %}
+{%   elif rs.subnets is defined %}
+{%     for s in rs.subnets %}
 rev-server={{ s }},{{ rs.nameserver }}
-{%        endfor %}
-{%      endif %}
-{%    endfor %}
-{% endif %}
+{%     endfor %}
+{%   endif %}
+{% endfor %}
 
-{% if dnsmasq_configure_locals is defined %}
-{%   for d in dnsmasq_configure_locals %}
+{% for d in dnsmasq_configure_locals | default([]) %}
 local=/{{ d }}/
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
-{% if dnsmasq_configure_addresses is defined %}
-{%   for h, i in dnsmasq_configure_addresses | dictsort %}
+{% for h, i in dnsmasq_configure_addresses | default({}) | dictsort %}
 address=/{{ h }}/{{ i }}
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
-{% if dnsmasq_configure_ipsets is defined %}
-{%   for s in dnsmasq_configure_ipsets %}
+{% for s in dnsmasq_configure_ipsets | default([]) %}
 ipset={{ s.domains | join('/') }}/{{ s.sets | join(',') }}
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
-{% if dnsmasq_configure_talks is defined %}
-{%  for s in dnsmasq_configure_talks %}
-server={{ s.server }}@{{ s.target }}{% if s.port is defined %}#{{ s.port }}{% endif %}
-{%  endfor %}
-{% endif %}
+{% for s in dnsmasq_configure_talks %}
+server={{ s.server }}@{{ s.target }}
+{%-  if s.port is defined %}#{{ s.port }}{% endif %}
+{% endfor %}
 
 {% if dnsmasq_configure_user is defined %}
 user={{ dnsmasq_configure_user }}
@@ -93,29 +80,21 @@ user={{ dnsmasq_configure_user }}
 group={{ dnsmasq_configure_group }}
 {% endif %}
 
-{% if dnsmasq_configure_interfaces is defined %}
-{%   for i in dnsmasq_configure_interfaces %}
+{% for i in dnsmasq_configure_interfaces | deault([]) %}
 interface={{ i }}
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
-{% if dnsmasq_configure_except_interfaces is defined %}
-{%   for ei in dnsmasq_configure_except_interfaces %}
+{% for ei in dnsmasq_configure_except_interfaces | default([]) %}
 except-interface={{ ei }}
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
-{% if dnsmasq_configure_listen_address is defined %}
-{%   for a in dnsmasq_configure_listen_addresses %}
+{% for a in dnsmasq_configure_listen_addresses | default([]) %}
 listen-address={{ a }}
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
-{% if dnsmasq_Configure_no_dhcp_interfaces is defined %}
-{%   for i in dnsmasq_configure_no_dhcp_interfaces %}
+{% for i in dnsmasq_configure_no_dhcp_interfaces | default([]) %}
 no-dhcp-interface={{ i }}
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
 {% if dnsmasq_configure_bind_interfaces | default(False) %}
 bind-interfaces
@@ -125,46 +104,42 @@ bind-interfaces
 no-hosts
 {% endif %}
 
-{% if dnsmasq_configure_addn_hosts is defined %}
-{%   for hf in dnsmasq_configure_addn_hosts %}
+{% for hf in dnsmasq_configure_addn_hosts | default([]) %}
 addn-hosts={{ hf }}
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
 {% if dnsmasq_configure_expand_hosts | default(False) %}
 expand-hosts
 {% endif %}
 
-{% if dnsmasq_configure_domains is defined %}
-{%   for d in dnsmasq_configure_domains %}
+{% for d in dnsmasq_configure_domains | default([]) %}
 domain={{ d.domain }}
-{%-    if d.subnet is defined %},{{ d.subnet }}
-{%-    elif d.range is defined %},{{ d.range.from }},{{ d.range.to }}
-{%    endif %}
-{%  endfor %}
-{% endif %}
+{%-  if d.subnet is defined %},{{ d.subnet }}
+{%-  elif d.range is defined %},{{ d.range.from }},{{ d.range.to }}
+{%-  endif %}
+{% endfor %}
 
-{% if dnsmasq_configure_dhcp_ranges is defined %}
-{%   for r in dnsmasq_configure_dhcp_ranges %}
+{% for r in dnsmasq_configure_dhcp_ranges | default([]) %}
 dhcp-range=
-{%-    if r.subnet is defined %}{{ r.subnet }}
-{%-      if r.static is defined %},static{% endif %}
-{%-      if r.ra_only is defined %},ra-only{% endif %}
-{%-      if r.ra_stateless %},ra-stateless{% endif %}
-{%-      if r.ra_names is defined %},ra-names{%- endif %}
-{%-      if r.duration is defined %},{{ r.duration }}{% endif %}
-{%     else %}
-{%-      if r.set is defined %}set:{{ r.set }},{% endif %}{{ r.range.from }},{{ r.range.to }}
-{%-        if r.slaac | default(False) | bool %},slaac{% endif %}
-{%-        if r.netmask is defined %},{{ r.netmask }}{% endif %}
-{%-        if r.prefix is defined %},{{ r.prefix }}{% endif %}
-{%-        if r.duration is defined %},{{ r.duration }}{% endif %}
-{%     endif %}
-{%   endfor %}
-{% endif %}
+{%-  if r.subnet is defined %}{{ r.subnet }}
+{%-    if r.static is defined %},static{% endif %}
+{%-    if r.ra_only is defined %},ra-only{% endif %}
+{%-    if r.ra_stateless %},ra-stateless{% endif %}
+{%-    if r.ra_names is defined %},ra-names{%- endif %}
+{%-    if r.duration is defined %},{{ r.duration }}{% endif %}
+{%-  else %}
+{%-    if r.set is defined %}set:{{ r.set }},{% endif %}{{ r.range.from }},{{ r.range.to }}
+{%-    if r.slaac | default(False) | bool %},slaac{% endif %}
+{%-    if r.netmask is defined %},{{ r.netmask }}{% endif %}
+{%-    if r.prefix is defined %},{{ r.prefix }}{% endif %}
+{%-    if r.duration is defined %},{{ r.duration }}{% endif %}
+{%-   endif %}
+{% endfor %}
+
 {% if dnsmasq_configure_enable_ra | default(False) | bool %}
 enable-ra
 {% endif %}
+
 {% for h in dnsmasq_configure_dhcp_hosts | default([]) %}
 dhcp-host={{ h.mac }}
 {%-  if h.host is defined %},{{ h.host }}{% endif %}
@@ -181,17 +156,13 @@ dhcp-host={{ h.mac }}
 dhcp-ignore=tag:{{ dnsmasq_configure_dhcp_ignore_tag }}
 {% endif %}
 
-{% if dnsmasq_configure_dhcp_vendor_classes is defined %}
-{%   for vc in dnsmasq_configure_dhcp_vendor_classes %}
+{% for vc in dnsmasq_configure_dhcp_vendor_classes | default([]) %}
 dhcp-vendorclass=set:{{ vc.set }},{{ vc.includes }}
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
-{% if dnsmasq_configure_dhcp_user_classes is defined %}
-{%   for uc in dnsmasq_configure_dhcp_user_classes %}
+{% for uc in dnsmasq_configure_dhcp_user_classes | default([]) %}
 dhcp-userclass=set:{{ uc.set }},{{ uc.includes }}
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
 {% for m in dnsmasq_configure_dhcp_macs | default([]) %}
 dhcp-mac=set:{{ m.set }},{{ m.mac_pattern }}
