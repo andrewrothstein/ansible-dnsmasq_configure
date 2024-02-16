@@ -1,80 +1,89 @@
 ---
-- hosts: all
+- name: Configure dnsmasq to hosts dhcp and dns for a subnet
+  hosts: all
   vars:
-    domain: private.nj.drewfus.org
+    dnsmasq_configure_activate: false
+    dnsmasq_configure_port: 53
+    dnsmasq_configure_domain_needed: true
+    dnsmasq_configure_bogus_priv: true
+    dnsmasq_configure_servers:
+      - domain: google.com
+        ip: 8.8.8.8
+    dnsmasq_configure_rev_servers:
+      - subnet: 192.168.0.0/26
+        nameserver: 192.168.0.1
+      - subnets:
+          - 192.168.0.0/26
+          - 10.0.0.0/8
+        nameserver: 192.168.0.1
+    dnsmasq_configure_locals:
+      - example.com
+      - foo.com
+    dnsmasq_configure_addresses:
+      gateway.nj.drewfus.org: 172.16.0.1
+    dnsmasq_configure_ipsets:
+      - domains:
+          - example.com
+          - foo.com
+        sets:
+          - foobar
+          - dingbat
+    dnsmasq_configure_talks:
+      - server: www.example.com
+        target: example-target
+        port: 1053
+    dnsmasq_configure_interfaces:
+      - eth0
+    dnsmasq_configure_except_interfaces:
+      - wifi0
+    dnsmasq_configure_listen_addresses:
+      - 127.0.0.1
+      - '[::1]'
+    dnsmasq_configure_domains:
+      - domain: example.com
+        subnet: 192.168.1.0/26
+      - domain: foo.com
+        subnet: 10.0.0.0/8
+        range:
+          from: 10.0.0.1
+          to: 10.254.254.254
+    dnsmasq_configure_dhcp_ranges:
+      - range:
+          from: 172.16.0.10
+          to: 172.16.254.254
+        netmask: 255.255.0.0
+        duration: '15m'
+    dnsmasq_configure_dhcp_userclasses:
+      - set: ipxe
+        includes: iPXE
+    dnsmasq_configure_dhcp_boots:
+      - tag: ipxe
+        file: https://boot.ipxe.org/ipxe.iso
+      - tags:
+          - efi64
+          - '#ipxe'
+        file: ipxe.efi
+      - tags:
+          - bios
+          - '#ipxe'
+        file: undionly.kpxe
+    dnsmasq_configure_dhcp_matches:
+      - set: efi64
+        opt: 60
+        val: PXEClient:Arch:00007
+      - set: efi64
+        opt: 60
+        val: PXEClient:Arch:00009
+      - set: bios
+        opt: 60
+        val: PXEClient:Arch:00000
+    dnsmasq_configure_log_dhcp: true
+    dnsmasq_configure_dhcp_options:
+      - opt: 'option:router'
+        val: 172.16.0.1
+      - opt: 'option:dns-server'
+        val: 172.16.0.1
+      - opt: 'option:domain_name'
+        val: nj.drewfus.org
   roles:
     - role: '{{ playbook_dir }}'
-      dnsmasq_configure_activate: False
-      dnsmasq_configure_interfaces:
-        - eth0
-      dnsmasq_configure_addresses:
-        matchbox.drewfus.org: '172.16.0.1'
-      dnsmasq_configure_listen_addresses:
-        - '172.16.0.1'
-        - '127.0.0.1'
-        - '[::1]'
-      dnsmasq_configure_domains:
-        - domain: '{{ domain }}'
-          range:
-            from: 172.16.0.1
-            to: 172.16.254.254
-      dnsmasq_configure_servers:
-        - domain: consul
-          ip: 127.0.0.1#8600
-      dnsmasq_configure_rev_servers:
-        - nameserver: 127.0.0.1#8600
-          subnets:
-            - 0.0.0.0/8
-            - 10.0.0.0/8
-            - 100.64.0.0/10
-            - 127.0.0.1/8
-            - 169.254.0.0/16
-            - 172.16.0.0/12
-            - 192.168.0.0/16
-            - 224.0.0.0/4
-            - 240.0.0.0/4
-      dnsmasq_configure_dhcp_userclasses:
-        - set: ipxe
-          includes: iPXE
-      dnsmasq_configure_dhcp_boots:
-        - tag: ipxe
-          file: http://matchbox.drewfus.org:8080/boot.ipxe
-        - tags:
-            - efi64
-            - '#ipxe'
-          file: ipxe.efi
-        - tags:
-            - bios
-            - '#ipxe'
-          file: undionly.kpxe
-      dnsmasq_configure_dhcp_matches:
-        - set: efi64
-          opt: 60
-          val: PXEClient:Arch:00007
-        - set: efi64
-          opt: 60
-          val: PXEClient:Arch:00009
-        - set: bios
-          opt: 60
-          val: PXEClient:Arch:00000
-      dnsmasq_configure_dhcp_hosts:
-        - mac: '85:51:fb:46:d9:6f'
-          address: '172.16.0.2'
-        - mac: '78:f2:9e:90:47:9b'
-          address: '172.16.0.3'
-        - mac: '78:f2:9e:90:47:99'
-          address: '172.16.0.4'
-      dnsmasq_configure_log_dhcp: True
-      dnsmasq_configure_dhcp_ranges:
-        - range:
-            from: 172.16.0.10
-            to: 172.16.254.254
-          netmask: 255.255.0.0
-          duration: '15m'
-      dnsmasq_configure_dhcp_options:
-        - opt: option:router
-          val: 172.16.0.1
-        - opt: option:dns-server
-          val: 172.16.0.1
-        - opt: option:domain_name
-          val: '{{ domain }}'
