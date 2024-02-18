@@ -143,7 +143,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 #dnsmasq_configure_except_interfaces:
 #  - wlp3s0
 
-  # Or which to listen on by address (remember to include 127.0.0.1 if
+# Or which to listen on by address (remember to include 127.0.0.1 if
 # you use this.)
 #dnsmasq_configure_listen_addresses:
 #  - '172.16.0.1'
@@ -472,7 +472,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 #      - '[1234::77]'
 #      - '[1234::88]'
 
-# Send DHCPv6 option for namservers as the machine running 
+# Send DHCPv6 option for namservers as the machine running
 # dnsmasq and another.
 #dnsmasq_configure_dhcp_options:
 #  - opt: option6:dns-server
