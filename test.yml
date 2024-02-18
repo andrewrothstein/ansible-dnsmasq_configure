@@ -3,42 +3,88 @@
   hosts: all
   vars:
     dnsmasq_configure_activate: false
-    dnsmasq_configure_port: 53
+    dnsmasq_configure_port: 5353
     dnsmasq_configure_domain_needed: true
     dnsmasq_configure_bogus_priv: true
+    dnsmasq_configure_conf_file: /etc/dnsmasq.conf
+    dnsmasq_configure_dnssec: true
+    dnsmasq_configure_dnssec_check_unsigned: true
+    dnsmasq_configure_filterwin2k: true
+    dnsmasq_configure_resolve_file: /etc/resolv.conf
+    dnsmasq_configure_strict_order: true
+    dnsmasq_configure_no_resolv: true
+    dnsmasq_configure_no_poll: true
     dnsmasq_configure_servers:
-      - domain: google.com
-        ip: 8.8.8.8
+      - domain: localnet
+        ip: 192.168.0.1
+      - domain: 3.168.192.in-addr.arpa
+        ip: 10.1.2.3
+      - ip: 10.1.2.3
+        interface: eth0
+      - ip: 10.1.2.3
+        interface: 192.168.1.1#53
     dnsmasq_configure_rev_servers:
       - subnet: 192.168.0.0/26
-        nameserver: 192.168.0.1
+        nameserver: 8.8.8.8
       - subnets:
-          - 192.168.0.0/26
+          - 172.16.0.0/14
           - 10.0.0.0/8
-        nameserver: 192.168.0.1
+        nameserver: 1.1.1.1
     dnsmasq_configure_locals:
-      - example.com
-      - foo.com
+      - localnet
     dnsmasq_configure_addresses:
-      gateway.nj.drewfus.org: 172.16.0.1
+      - domain: double-click.net
+        ip: 127.0.0.1
+      - domain: www.thekelleys.org.uk
+        ip: fe80::20d:60ff:fe36:f83
     dnsmasq_configure_ipsets:
       - domains:
-          - example.com
-          - foo.com
+          - yahoo.com
+          - google.com
         sets:
-          - foobar
-          - dingbat
+          - vpn
+          - search
+    dnsmasq_configure_nftsets:
+      - domains:
+          - yahoo.com
+          - google.com
+        sets:
+          - ip#test#vpn
+          - ip#test#search
+      - domains:
+          - yahoo.com
+        sets:
+          - 4#ip#test#vpn4
+      - domains:
+          - yahoo.com
+        sets:
+          - 6#ip#test#vpn6
     dnsmasq_configure_talks:
-      - server: www.example.com
+      - server: www-1.example.com
         target: example-target
         port: 1053
+      - server: www-2.example.com
+        target: other-target
+    dnsmasq_configure_user: username
+    dnsmasq_configure_grou: groupname
     dnsmasq_configure_interfaces:
       - eth0
+      - eth1
     dnsmasq_configure_except_interfaces:
       - wifi0
+      - wifi2
     dnsmasq_configure_listen_addresses:
       - 127.0.0.1
       - '[::1]'
+    dnsmasq_confgure_no_dhcp_interfaces:
+      - eth3
+      - eth4
+    dnsmasq_configure_bind_interfaces: true
+    dnsmasq_configure_no_hosts: true
+    dnsmasq_configure_addn_hosts:
+      - host1.example.com
+      - host2.example.com
+    dnsmasq_configure_expand_hosts: true
     dnsmasq_configure_domains:
       - domain: example.com
         subnet: 192.168.1.0/26
@@ -48,14 +94,52 @@
           from: 10.0.0.1
           to: 10.254.254.254
     dnsmasq_configure_dhcp_ranges:
+      - subnet: 10.0.0.0/8
+        static: true
+        ra_only: true
+        ra_stateless: true
+        ra_names: true
+        duration: '20m'
       - range:
           from: 172.16.0.10
           to: 172.16.254.254
+        set: foo
         netmask: 255.255.0.0
+        slaac: true
         duration: '15m'
+    dnsmasq_configure_enable_ra: true
+    dnsmasq_configure_dhcp_hosts:
+      - mac: 00:11:22:33:44
+        host: gateway.drewfus.org
+        address: 192.168.0.23
+        ipv6: '[::1]'
+        duration: '30m'
+        infinite: true
+        ignore: true
+        ignore_all: true
+        set: foobar
+    dnsmasq_configure_dhcp_ignore_tag: foobar
+    dnsmasq_onfigure_dhcp_vendor_classes:
+      - set: foo
+        includes: bar
     dnsmasq_configure_dhcp_userclasses:
       - set: ipxe
         includes: iPXE
+    dnsmasq_configure_dhcp_macs:
+      - set: red
+        mac_pattern: 11:22:33:*:*:*
+    dnsmasq_configure_read_ethers: true
+    dnsmasq_configure_dhcp_options:
+      - opt: 'option:router'
+        val: 172.16.0.1
+      - opt: 'option:dns-server'
+        val: 172.16.0.1
+      - opt: 'option:domain_name'
+        val: nj.drewfus.org
+      - opt: 'option:other-opt'
+        vals:
+          - val1
+          - val2
     dnsmasq_configure_dhcp_boots:
       - tag: ipxe
         file: https://boot.ipxe.org/ipxe.iso
@@ -67,6 +151,18 @@
           - bios
           - '#ipxe'
         file: undionly.kpxe
+      - file: pxelinux.0
+        tags:
+          - bar
+          - bar2
+        tftp_servername: tftp.example.com
+      - file: pxelinux.1
+        tags:
+          - bing
+          - bing2
+        tftp_servernames:
+          - tftp.example.com
+          - tftp2.example.com
     dnsmasq_configure_dhcp_matches:
       - set: efi64
         opt: 60
@@ -77,13 +173,80 @@
       - set: bios
         opt: 60
         val: PXEClient:Arch:00000
+    dnsmasq_configure_pxe_prompts:
+      - prompt: pxe-prompt-1
+        wait: '5s'
+      - prompt: pxe-prompt-2
+    dnsmasq_configure_pxe_services:
+      - id: pxe-svc-id
+        name: pxe-svc-name
+        image: pxe-img
+        tftp_server: pxe-tftp-server
+    dnsmasq_configure_enable_tftp: true
+    dnsmasq_configure_tftp_root: /tftp-root
+    dnsmasq_configure_tftp_no_fail: true
+    dnsmasq_configure_tftp_secure: true
+    dnsmasq_configure_tftp_no_blocksize: true
+    dnsmasq_configure_dhcp_lease_max: 150
+    dnsmasq_configure_dhcp_lease_file: /var/lib/misc/dnsmasq.leases
+    dnsmasq_configure_dhcp_authoritative: true
+    dnsmasq_configure_dhcp_script: /bin/echo
+    dnsmasq_configure_cache_size: 150
+    dnsmasq_configure_no_negcache: true
+    dnsmasq_configure_local_ttl: '3s'
+    dnsmasq_configure_bogus_nxdomain: 64.94.110.11
+    dnsmasq_configure_aliases:
+      - src: 1.2.3.4
+        target: 5.6.7.8
+      - src: 1.2.3.0
+        target: 5.6.7.0
+        netmask: 255.255.255.0
+    dnsmasq_configure_mx_host:
+      record: maildomain.com
+      target: servermachine.com
+      preference: 50
+    dnsmasq_configure_mx_target: servermachine.com
+    dnsmasq_configure_localmx: true
+    dnsmasq_configure_selfmx: true
+    dnsmasq_configure_srv_hosts:
+      - domain: example.com
+        name: _ldap._tcp
+        target: ldapserver.example.com
+        port: 389
+      - name: _ldap._tcp.example.com
+        target: ldapserver.example.com
+        port: 389
+        weight: 1
+      - name: _ldap._tcp.example.com
+        target: ldapserver2.example.com
+        port: 389
+        weight: 2
+    dnsmasq_configure_ptr_records:
+      - name: _http._tcp.dns-sd-services
+        val: New Employee Page._http._tcp.dns-sd-services
+    dnsmasq_configure_txt_records:
+      - name: example.com
+        vals:
+          - v=spf1 a -all
+      - name: _http._tcp.example.com
+        vals:
+          - name=value
+          - paper=A4
+    dnsmasq_configure_cnames:
+      - local: bertand
+        alias: bert
+    dnsmasq_configure_log_queries: true
     dnsmasq_configure_log_dhcp: true
-    dnsmasq_configure_dhcp_options:
-      - opt: 'option:router'
-        val: 172.16.0.1
-      - opt: 'option:dns-server'
-        val: 172.16.0.1
-      - opt: 'option:domain_name'
-        val: nj.drewfus.org
+    dnsmasq_configure_conf_files:
+      - /etc/dnsmasq.more.conf
+      - '%%PREFIX%%/share/dnsmasq/trust-anchors.conf'
+    dnsmasq_configure_conf_dirs:
+      - d: /etc/dnsmasq.d
+      - d: /etc/dnsmasq.d
+        includes:
+          - .conf
+      - d: /etc/dnsmasq.d
+        excludes:
+          - .bak
   roles:
     - role: '{{ playbook_dir }}'
