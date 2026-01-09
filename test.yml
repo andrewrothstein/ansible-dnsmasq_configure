@@ -197,9 +197,9 @@
     dnsmasq_configure_bogus_nxdomain: 64.94.110.11
     dnsmasq_configure_aliases:
       - src: 1.2.3.4
-        target: 5.6.7.8
+        dest: 5.6.7.8
       - src: 1.2.3.0
-        target: 5.6.7.0
+        dest: 5.6.7.0
         netmask: 255.255.255.0
     dnsmasq_configure_mx_host:
       record: maildomain.com
@@ -246,7 +246,7 @@
         includes:
           - .conf
       - d: /etc/dnsmasq.d
-        excludes:
+        excepts:
           - .bak
   roles:
     - role: '{{ playbook_dir }}'

@@ -1,5 +1,5 @@
 # dnsmasq.conf
-{% if dnsmasq_configure_port is defined %}
+{%- if dnsmasq_configure_port is defined %}
 port={{ dnsmasq_configure_port }}
 {% endif %}
 
@@ -51,14 +51,14 @@ server=
 {% endfor %}
 
 {%- for rs in dnsmasq_configure_rev_servers | default([]) %}
-{%   if rs.subnet is defined %}
+{%-  if rs.subnet is defined %}
 rev-server={{ rs.subnet }},{{ rs.nameserver }}
-{%   elif rs.subnets is defined %}
-{%     for s in rs.subnets %}
+{%-  elif rs.subnets is defined %}
+{%-    for s in rs.subnets %}
 rev-server={{ s }},{{ rs.nameserver }}
-{%     endfor %}
-{%   endif %}
-{% endfor %}
+{%-    endfor %}
+{%-  endif %}
+{%- endfor %}
 
 {%- for d in dnsmasq_configure_locals | default([]) %}
 local=/{{ d }}/
@@ -73,10 +73,10 @@ ipset={{ s.domains | join('/') }}/{{ s.sets | join(',') }}
 {% endfor %}
 
 {%- for s in dnsmasq_configure_nftsets | default([]) %}
-ntfset={{ s.domains | join('/') }}/{{ s.sets | join(',') }}
+nftset={{ s.domains | join('/') }}/{{ s.sets | join(',') }}
 {% endfor %}
 
-{%- for s in dnsmasq_configure_talks %}
+{%- for s in dnsmasq_configure_talks | default([]) %}
 server={{ s.server }}@{{ s.target }}
 {%-  if s.port is defined %}#{{ s.port }}{% endif +%}
 {% endfor %}
@@ -186,18 +186,18 @@ read-ethers
 dhcp-option{% if o.force | default(False) | bool %}-force{% endif %}=
 {%-  if o.tag is defined %}{{ o.tag }},{% endif %}{{ o.opt }}
 {%-  if o.val is defined %},{{ o.val }}
-{%-  elif o.vals is defined %}{{ o.vals | join(",") }}
+{%-  elif o.vals is defined %},{{ o.vals | join(",") }}
 {%-  endif +%}
 {% endfor %}
 
 {%- for b in dnsmasq_configure_dhcp_boots | default([]) %}
 dhcp-boot=
 {%-  if b.tag is defined %}tag:{{ b.tag }}
-{%-  elif b.tags is defined -%}tag:{{ b.tags | join(",tag:") }}
+{%-  elif b.tags is defined %}tag:{{ b.tags | join(",tag:") }}
 {%-  endif %},{{ b.file }}
-{%-  if b.tftp_servername is defined %},{{ b.tftp_servername }}{%  endif %}
-{%-  if b.tftp_servernames is defined %},{{ b.tftp_servernames | join(",") }}{%  endif +%}
-{% endfor %}
+{%-  if b.tftp_servername is defined %},{{ b.tftp_servername }}{% endif %}
+{%-  if b.tftp_servernames is defined %},{{ b.tftp_servernames | join(",") }}{% endif +%}
+{%- endfor %}
 
 {%- for m in dnsmasq_configure_dhcp_matches | default([]) %}
 dhcp-match=
@@ -271,7 +271,7 @@ bogus-nxdomain={{ dnsmasq_configure_bogus_nxdomain }}
 {% endif %}
 
 {%- for a in dnsmasq_configure_aliases | default([]) %}
-alias={{ a.src }},{{ a.target }}
+alias={{ a.src }},{{ a.dest }}
   {%- if a.netmask is defined %},{{ a.netmask }}{% endif +%}
 {% endfor %}
 
@@ -294,9 +294,9 @@ selfmx
 {% endif %}
 
 {%- for h in dnsmasq_configure_srv_hosts | default([]) %}
-{%   if h.domain is defined %}
+{%-  if h.domain is defined %}
 domain={{ h.domain }}
-{%   endif %}
+{%-  endif %}
 srv-host={{ h.name }}
 {%-  if h.target is defined %},{{ h.target }}{% endif %}
 {%-  if h.port is defined %},{{ h.port }}{% endif %}
@@ -332,5 +332,5 @@ conf-file={{ f }}
 {%- for d in dnsmasq_configure_conf_dirs | default([]) %}
 conf-dir={{ d.d }}
   {%- if d.includes is defined %},*{{ d.includes | join(",*") }}{% endif %}
-  {%- if d.excludes is defined %},{{ d.excludes | join(",") }}{% endif +%}
+  {%- if d.excepts is defined %},{{ d.excepts | join(",") }}{% endif +%}
 {% endfor %}
