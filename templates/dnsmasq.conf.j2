@@ -51,14 +51,14 @@ server=
 {% endfor %}
 
 {%- for rs in dnsmasq_configure_rev_servers | default([]) %}
-{%   if rs.subnet is defined %}
+{%-  if rs.subnet is defined %}
 rev-server={{ rs.subnet }},{{ rs.nameserver }}
-{%   elif rs.subnets is defined %}
-{%     for s in rs.subnets %}
+{%-  elif rs.subnets is defined %}
+{%-    for s in rs.subnets %}
 rev-server={{ s }},{{ rs.nameserver }}
-{%     endfor %}
-{%   endif %}
-{% endfor %}
+{%-    endfor %}
+{%-  endif %}
+{%- endfor %}
 
 {%- for d in dnsmasq_configure_locals | default([]) %}
 local=/{{ d }}/
@@ -193,11 +193,11 @@ dhcp-option{% if o.force | default(False) | bool %}-force{% endif %}=
 {%- for b in dnsmasq_configure_dhcp_boots | default([]) %}
 dhcp-boot=
 {%-  if b.tag is defined %}tag:{{ b.tag }}
-{%-  elif b.tags is defined -%}tag:{{ b.tags | join(",tag:") }}
+{%-  elif b.tags is defined %}tag:{{ b.tags | join(",tag:") }}
 {%-  endif %},{{ b.file }}
-{%-  if b.tftp_servername is defined %},{{ b.tftp_servername }}{%  endif %}
-{%-  if b.tftp_servernames is defined %},{{ b.tftp_servernames | join(",") }}{%  endif +%}
-{% endfor %}
+{%-  if b.tftp_servername is defined %},{{ b.tftp_servername }}{% endif %}
+{%-  if b.tftp_servernames is defined %},{{ b.tftp_servernames | join(",") }}{% endif +%}
+{%- endfor %}
 
 {%- for m in dnsmasq_configure_dhcp_matches | default([]) %}
 dhcp-match=
@@ -294,9 +294,9 @@ selfmx
 {% endif %}
 
 {%- for h in dnsmasq_configure_srv_hosts | default([]) %}
-{%   if h.domain is defined %}
+{%-  if h.domain is defined %}
 domain={{ h.domain }}
-{%   endif %}
+{%-  endif %}
 srv-host={{ h.name }}
 {%-  if h.target is defined %},{{ h.target }}{% endif %}
 {%-  if h.port is defined %},{{ h.port }}{% endif %}
