@@ -1,6 +1,6 @@
 ---
 # handlers file for dnsmasq-configure
-- name: dnsmasq_configure_restart
+- name: Dnsmasq_configure_restart
   become: '{{ dnsmasq_configure_privilege_escalate }}'
   become_user: root
   when: dnsmasq_configure_activate

@@ -867,10 +867,10 @@ dnsmasq_configure_disable_systemd_resolved: false
 
 # Return an MX record pointing to the mx-target for all local
 # machines.
-#dnsmasq_configure_localmx: true
+# dnsmasq_configure_localmx: true
 
 # Return an MX record pointing to itself for all local machines.
-#dnsmasq_configure_selfmx: true
+# dnsmasq_configure_selfmx: true
 
 # Change the following lines if you want dnsmasq to serve SRV
 # records.  These are useful if you want to serve ldap requests for
@@ -885,22 +885,22 @@ dnsmasq_configure_disable_systemd_resolved: false
 
 # A SRV record sending LDAP for the example.com domain to
 # ldapserver.example.com port 389
-#dnsmasq_configure_srv_hosts:
-#  - name: _ldap._tcp.example.com
+# dnsmasq_configure_srv_hosts:
+#   - name: _ldap._tcp.example.com
 #    target: ldapserver.example.com
 #    port: 389
 
 # A SRV record sending LDAP for the example.com domain to
 # ldapserver.example.com port 389 (using domain=)
-#dnsmasq_configure_srv_hosts:
-#  - domain: example.com
+# dnsmasq_configure_srv_hosts:
+#   - domain: example.com
 #    name: _ldap._tcp
 #    target: ldapserver.example.com
 #    port: 389
 
 # Two SRV records for LDAP, each with different priorities
-#dnsmasq_configure_srv_hosts:
-#  - name: _ldap._tcp.example.com
+# dnsmasq_configure_srv_hosts:
+#   - name: _ldap._tcp.example.com
 #    target: ldapserver.example.com
 #    port: 389
 #    priority: 1
@@ -911,15 +911,15 @@ dnsmasq_configure_disable_systemd_resolved: false
 
 # A SRV record indicating that there is no LDAP server for the domain
 # example.com
-#dnsmasq_configure_srv_hosts:
-#  - name: _ldap._tcp.example.com
+# dnsmasq_configure_srv_hosts:
+#   - name: _ldap._tcp.example.com
 
 # The following line shows how to make dnsmasq serve an arbitrary PTR
 # record. This is useful for DNS-SD. (Note that the
 # domain-name expansion done for SRV records _does_not
 # occur for PTR records.)
-#dnsmasq_configure_ptr_records:
-#  - name: _http._tcp.dns-sd-services
+# dnsmasq_configure_ptr_records:
+#   - name: _http._tcp.dns-sd-services
 #    val: New Employee Page._http._tcp.dns-sd-services
 
 # Change the following lines to enable dnsmasq to serve TXT records.
@@ -927,15 +927,15 @@ dnsmasq_configure_disable_systemd_resolved: false
 # domain-name expansion done for SRV records _does_not
 # occur for TXT records.)
 
-#Example SPF.
-#dnsmasq_configure_txt_records:
-#  - name: example.com
+# Example SPF.
+# dnsmasq_configure_txt_records:
+#   - name: example.com
 #    vals:
 #      - v=spf1 a -all
 
-#Example zeroconf
-#dnsmasq_configure_txt_records:
-#  - name: _http._tcp.example.com
+# Example zeroconf
+# dnsmasq_configure_txt_records:
+#   - name: _http._tcp.example.com
 #    vals:
 #      - name=value
 #      - paper=A4
@@ -943,41 +943,41 @@ dnsmasq_configure_disable_systemd_resolved: false
 # Provide an alias for a "local" DNS name. Note that this _only_ works
 # for targets which are names from DHCP or /etc/hosts. Give host
 # "bert" another name, bertrand
-#dnsmasq_configure_cnames:
-#  - local: bertand
+# dnsmasq_configure_cnames:
+#   - local: bertand
 #    alias: bert
 
 # For debugging purposes, log each DNS query as it passes through
 # dnsmasq.
-#dnsmasq_configure_log_queries: true
+# dnsmasq_configure_log_queries: true
 
 # Log lots of extra information about DHCP transactions.
-#dnsmasq_configure_log_dhcp: true
+# dnsmasq_configure_log_dhcp: true
 
 # Include another lot of configuration options.
-#dnsmasq_configure_conf_files:
-#  - /etc/dnsmasq.more.conf
-#dnsmasq_configure_conf_dirs:
-#  - d: /etc/dnsmasq.d
+# dnsmasq_configure_conf_files:
+#   - /etc/dnsmasq.more.conf
+# dnsmasq_configure_conf_dirs:
+#   - d: /etc/dnsmasq.d
 
 # Include all the files in a directory except those ending in .bak
-#dnsmasq_configure_conf_dirs:
-#  - d: /etc/dnsmasq.d
-#    excepts:
+# dnsmasq_configure_conf_dirs:
+#   - d: /etc/dnsmasq.d
+#     excepts:
 #      - .bak
 
 # Include all files in a directory which end in .conf
-#dnsmasq_configure_conf_dirs:
-#  - d: /etc/dnsmasq.d/
-#    includes:
+# dnsmasq_configure_conf_dirs:
+#   - d: /etc/dnsmasq.d/
+#     includes:
 #      - .conf
 
 # Include all files in /etc/dnsmasq.d except RPM backup files
-#dnsmasq_configure_conf_dirs:
-#  - d: /etc/dnsmasq.d
-#    excepts:
+# dnsmasq_configure_conf_dirs:
+#   - d: /etc/dnsmasq.d
+#     excepts:
 #      - .rpmnew
 #      - .rpmsave
 #      - .rpmorig
 
-#dnsmasq_configure_dhcp_log: true
+# dnsmasq_configure_dhcp_log: true
