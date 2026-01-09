@@ -1,12 +1,12 @@
 ---
-dnsmasq_configure_privilege_escalate: True
+dnsmasq_configure_privilege_escalate: true
 
 # to activate or not the dnsmasq service
-dnsmasq_configure_activate: True
+dnsmasq_configure_activate: true
 
 # disable the systemd-resolved service when activating dnsmasq
 # to prevent them from crashing into each other
-dnsmasq_configure_disable_systemd_resolved: False
+dnsmasq_configure_disable_systemd_resolved: false
 
 # defaults file for dnsmasq-configure
 #dnsmasq_configure_conf_dir: /etc
@@ -24,28 +24,28 @@ dnsmasq_configure_disable_systemd_resolved: False
 # these requests from bringing up the link unnecessarily.
 
 # Never forward plain names (without a dot or domain part)
-#dnsmasq_configure_domain_needed: True
+#dnsmasq_configure_domain_needed: true
 # Never forward addresses in the non-routed address spaces.
-#dnsmasq_configure_bogus_priv: True
+#dnsmasq_configure_bogus_priv: true
 # Uncomment these to enable DNSSEC validation and caching:
 # (Requires dnsmasq to be built with DNSSEC option.)
 #dnsmasq_configure_conf_file: /usr/share/dnsmasq/trust-anchors.conf
-#dnsmasq_configure_dnssec: True
+#dnsmasq_configure_dnssec: true
 
 # Replies which are not DNSSEC signed may be legitimate, because the domain
 # is unsigned, or may be forgeries. Setting this option tells dnsmasq to
-# check that an unsigned reply is OK, by finding a secure proof that a DS 
-# record somewhere between the root and the domain does not exist. 
+# check that an unsigned reply is OK, by finding a secure proof that a DS
+# record somewhere between the root and the domain does not exist.
 # The cost of setting this is that even queries in unsigned domains will need
 # one or more extra DNS queries to verify.
-#dnsmasq_configure_dnssec_check_unsigned: True
+#dnsmasq_configure_dnssec_check_unsigned: true
 # Uncomment this to filter useless windows-originated DNS requests
 # which can trigger dial-on-demand links needlessly.
 # Note that (amongst other things) this blocks all SRV requests,
 # so don't use it if you use eg Kerberos, SIP, XMMP or Google-talk.
 # This option only affects forwarding, SRV records originating for
 # dnsmasq (via srv-host= lines) are not suppressed by it.
-#dnsmasq_configure_filterwin2k: True
+#dnsmasq_configure_filterwin2k: true
 
 # Change this line if you want dns to get its upstream servers from
 # somewhere other that /etc/resolv.conf
@@ -56,15 +56,15 @@ dnsmasq_configure_disable_systemd_resolved: False
 # to  be  up.  Uncommenting this forces dnsmasq to try each query
 # with  each  server  strictly  in  the  order  they   appear   in
 # /etc/resolv.conf
-#dnsmasq_configure_strict_order: True
+#dnsmasq_configure_strict_order: true
 
 # If you don't want dnsmasq to read /etc/resolv.conf or any other
 # file, getting its servers from this file instead (see below), then
 # uncomment this.
-#dnsmasq_configure_no_resolv: True
+#dnsmasq_configure_no_resolv: true
 # If you don't want dnsmasq to poll /etc/resolv.conf or other resolv
 # files for changes and re-read them then uncomment this.
-#dnsmasq_configure_no_poll: True
+#dnsmasq_configure_no_poll: true
 
 # Add other name servers here, with domain specs if they are for
 # non-public domains.
@@ -163,11 +163,11 @@ dnsmasq_configure_disable_systemd_resolved: False
 # want dnsmasq to really bind only the interfaces it is listening on,
 # uncomment this option. About the only time you may need this is when
 # running another nameserver on the same machine.
-#dnsmasq_configure_bind_interfaces: True
+#dnsmasq_configure_bind_interfaces: true
 
 # If you don't want dnsmasq to read /etc/hosts, uncomment the
 # following line.
-#dnsmasq_configure_no_hosts: True
+#dnsmasq_configure_no_hosts: true
 # or if you want it to read another file, as well as /etc/hosts, use
 # this.
 #dnsmasq_configure_addn_hosts:
@@ -175,7 +175,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 
 # Set this (and domain: see below) if you want to have a domain
 # automatically added to simple names in a hosts-file.
-#dnsmasq_configure_expand_hosts: True
+#dnsmasq_configure_expand_hosts: true
 
 # Set the domain for dnsmasq. this is optional, but if it is set, it
 # does the following things.
@@ -257,7 +257,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 # Do Router Advertisements, BUT NOT DHCP for this subnet.
 #dnsmasq_configure_dhcp_ranges:
 #  - subnet: '1234::'
-#    ra_only: True
+#    ra_only: true
 
 # Do Router Advertisements, BUT NOT DHCP for this subnet, also try and
 # add names to the DNS for the IPv6 address of SLAAC-configured dual-stack 
@@ -266,13 +266,13 @@ dnsmasq_configure_disable_systemd_resolved: False
 # IPv6 address calculated using the SLAAC alogrithm.
 #dnsmasq_configure_dhcp_ranges:
 #  - subnet: '1234::'
-#    ra_names: True
+#    ra_names: true
 
 # Do Router Advertisements, BUT NOT DHCP for this subnet.
 # Set the lifetime to 46 hours. (Note: minimum lifetime is 2 hours.)
 #dnsmasq_configure_dhcp_ranges:
 #  - subnet:  '1234::'
-#    ra_only: True
+#    ra_only: true
 #    duration: '48h'
 
 # Do DHCP and Router Advertisements for this subnet. Set the A bit in the RA
@@ -281,29 +281,29 @@ dnsmasq_configure_disable_systemd_resolved: False
 #  - range:
 #      from: '1234::2'
 #      to: '1234::500'
-#    slaac: True
+#    slaac: true
 
 # Do Router Advertisements and stateless DHCP for this subnet. Clients will
 # not get addresses from DHCP, but they will get other configuration information.
 # They will use SLAAC for addresses.
 #dnsmasq_configure_dhcp_ranges:
 #  - subnet: '1234::'
-#    ra_stateless: True
+#    ra_stateless: true
 
 # Do stateless DHCP, SLAAC, and generate DNS names for SLAAC addresses
 # from DHCPv4 leases.
 #dhcp-range=1234::, ra-stateless, ra-names
 #dnsmasq_configure_dhcp_ranges:
 #  - subnet: '1234::'
-#    ra_stateless: True
-#    ra_names: True
+#    ra_stateless: true
+#    ra_names: true
 
 # Do router advertisements for all subnets where we're doing DHCPv6
 # Unless overriden by ra-stateless, ra-names, et al, the router 
 # advertisements will have the M and O bits set, so that the clients
 # get addresses and configuration from DHCPv6, and the A bit reset, so the 
 # clients don't use SLAAC addresses.
-#dnsmasq_configure_enable_ra: True
+#dnsmasq_configure_enable_ra: true
 
 # Supply parameters for specified hosts using DHCP. There are lots
 # of valid alternatives, so we will give examples of each. Note that
@@ -337,7 +337,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 #dnsmasq_configure_dhcp_hosts:
 #  - mac: bert
 #    address: '192.168.0.70'
-#    infinite: True
+#    infinite: true
 
 # Always give the host with client identifier 01:02:02:04
 # the IP address 192.168.0.60
@@ -370,7 +370,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 # address is 11:22:33:44:55:66
 #dnsmasq_configure_dhcp_hosts:
 #  - mac: '11:22:33:44:55:66'
-#    ignore: True
+#    ignore: true
 
 # Ignore any client-id presented by the machine with Ethernet
 # address 11:22:33:44:55:66. This is useful to prevent a machine
@@ -378,7 +378,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 # between PXE boot and OS boot.
 #dnsmasq_configure_dhcp_hosts:
 #  - mac: '11:22:33:44:55:66'
-#    ignore_all: True
+#    ignore_all: true
 
 # Send extra options which are tagged as "red" to
 # the machine with Ethernet address 11:22:33:44:55:66
@@ -429,7 +429,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 # on the ethernet-address/IP pairs found there just as if they had
 # been given as --dhcp-host options. Useful if you keep
 # MAC-address/host mappings there for other purposes.
-#dnsmasq_configure_read_ethers: True
+#dnsmasq_configure_read_ethers: true
 
 # Send options to hosts which ask for a DHCP lease.
 # See RFC 2132 for details of available options.
@@ -612,25 +612,25 @@ dnsmasq_configure_disable_systemd_resolved: False
 # See http://syslinux.zytor.com/pxe.php#special for details.
 # Magic number - needed before anything else is recognised
 #dnsmasq_configure_dhcp_options:
-#  - force: True
+#  - force: true
 #    opt: 208
 #    val: f1:00:74:7e
 
 # Configuration file name
 #dnsmasq_configure_dhcp_options:
-#  - force: True
+#  - force: true
 #    opt: 209
 #    val: configs/common
 
 # Path prefix
 #dnsmasq_configure_dhcp_options:
-#  - force: True
+#  - force: true
 #    opt: 10
 #    val: /tftpboot/pxelinux/files/
 
 # Reboot time. (Note 'i' to send 32-bit value)
 #dnsmasq_configure_dhcp_options:
-#  - force: True
+#  - force: true
 #    opt: 211
 #    val: '30i'
 
@@ -747,22 +747,22 @@ dnsmasq_configure_disable_systemd_resolved: False
 #    tftp_server: 1.2.3.4
 
 # Enable dnsmasq's built-in TFTP server
-#dnsmasq_configure_enable_tftp: True
+#dnsmasq_configure_enable_tftp: true
 
 # Set the root directory for files available via FTP.
 #dnsmasq_configure_tftp_root: /var/lib/tftpboot
 
 # Do not abort if the tftp-root is unavailable
-#dnsmasq_configure_tftp_no_fail: True
+#dnsmasq_configure_tftp_no_fail: true
 
 # Make the TFTP server more secure: with this set, only files owned by
 # the user dnsmasq is running as will be send over the net.
-#dnsmasq_configure_tftp_secure: True
+#dnsmasq_configure_tftp_secure: true
 
 # This option stops dnsmasq from negotiating a larger blocksize for TFTP
 # transfers. It will slow things down, but may rescue some broken TFTP
 # clients.
-#dnsmasq_configure_tftp_no_blocksize: True
+#dnsmasq_configure_tftp_no_blocksize: true
 
 # Set the boot file name only when the "red" tag is set.
 #dnsmasq_configure_dhcp_boots:
@@ -806,7 +806,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 # server for your campus/company accidentally. The ISC server uses
 # the same option, and this URL provides more information:
 # http://www.isc.org/files/auth.html
-#dnsmasq_configure_dhcp_authoritative: True
+#dnsmasq_configure_dhcp_authoritative: true
 
 # Run an executable when a DHCP lease is created or destroyed.
 # The arguments sent to the script are "add" or "del",
@@ -818,7 +818,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 #dnsmasq_configure_cache_size: 150
 
 # If you want to disable negative caching, uncomment this.
-#dnsmasq_configure_no_negcache: True
+#dnsmasq_configure_no_negcache: true
 
 # Normally responses which come from /etc/hosts and the DHCP lease
 # file have Time-To-Live set as zero, which conventionally means
@@ -867,10 +867,10 @@ dnsmasq_configure_disable_systemd_resolved: False
 
 # Return an MX record pointing to the mx-target for all local
 # machines.
-#dnsmasq_configure_localmx: True
+#dnsmasq_configure_localmx: true
 
 # Return an MX record pointing to itself for all local machines.
-#dnsmasq_configure_selfmx: True
+#dnsmasq_configure_selfmx: true
 
 # Change the following lines if you want dnsmasq to serve SRV
 # records.  These are useful if you want to serve ldap requests for
@@ -949,10 +949,10 @@ dnsmasq_configure_disable_systemd_resolved: False
 
 # For debugging purposes, log each DNS query as it passes through
 # dnsmasq.
-#dnsmasq_configure_log_queries: True
+#dnsmasq_configure_log_queries: true
 
 # Log lots of extra information about DHCP transactions.
-#dnsmasq_configure_log_dhcp: True
+#dnsmasq_configure_log_dhcp: true
 
 # Include another lot of configuration options.
 #dnsmasq_configure_conf_files:
@@ -980,4 +980,4 @@ dnsmasq_configure_disable_systemd_resolved: False
 #      - .rpmsave
 #      - .rpmorig
 
-#dnsmasq_configure_dhcp_log: True
+#dnsmasq_configure_dhcp_log: true
