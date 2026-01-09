@@ -1,5 +1,5 @@
 # dnsmasq.conf
-{% if dnsmasq_configure_port is defined %}
+{%- if dnsmasq_configure_port is defined %}
 port={{ dnsmasq_configure_port }}
 {% endif %}
 
@@ -73,10 +73,10 @@ ipset={{ s.domains | join('/') }}/{{ s.sets | join(',') }}
 {% endfor %}
 
 {%- for s in dnsmasq_configure_nftsets | default([]) %}
-ntfset={{ s.domains | join('/') }}/{{ s.sets | join(',') }}
+nftset={{ s.domains | join('/') }}/{{ s.sets | join(',') }}
 {% endfor %}
 
-{%- for s in dnsmasq_configure_talks %}
+{%- for s in dnsmasq_configure_talks | default([]) %}
 server={{ s.server }}@{{ s.target }}
 {%-  if s.port is defined %}#{{ s.port }}{% endif +%}
 {% endfor %}
@@ -186,7 +186,7 @@ read-ethers
 dhcp-option{% if o.force | default(False) | bool %}-force{% endif %}=
 {%-  if o.tag is defined %}{{ o.tag }},{% endif %}{{ o.opt }}
 {%-  if o.val is defined %},{{ o.val }}
-{%-  elif o.vals is defined %}{{ o.vals | join(",") }}
+{%-  elif o.vals is defined %},{{ o.vals | join(",") }}
 {%-  endif +%}
 {% endfor %}
 
@@ -271,7 +271,7 @@ bogus-nxdomain={{ dnsmasq_configure_bogus_nxdomain }}
 {% endif %}
 
 {%- for a in dnsmasq_configure_aliases | default([]) %}
-alias={{ a.src }},{{ a.target }}
+alias={{ a.src }},{{ a.dest }}
   {%- if a.netmask is defined %},{{ a.netmask }}{% endif +%}
 {% endfor %}
 
@@ -332,5 +332,5 @@ conf-file={{ f }}
 {%- for d in dnsmasq_configure_conf_dirs | default([]) %}
 conf-dir={{ d.d }}
   {%- if d.includes is defined %},*{{ d.includes | join(",*") }}{% endif %}
-  {%- if d.excludes is defined %},{{ d.excludes | join(",") }}{% endif +%}
+  {%- if d.excepts is defined %},{{ d.excepts | join(",") }}{% endif +%}
 {% endfor %}

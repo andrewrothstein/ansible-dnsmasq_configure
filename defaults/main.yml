@@ -64,7 +64,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 #dnsmasq_configure_no_resolv: True
 # If you don't want dnsmasq to poll /etc/resolv.conf or other resolv
 # files for changes and re-read them then uncomment this.
-#dnsmasq_configure_no-poll
+#dnsmasq_configure_no_poll: True
 
 # Add other name servers here, with domain specs if they are for
 # non-public domains.
@@ -96,12 +96,14 @@ dnsmasq_configure_disable_systemd_resolved: False
 # Add domains which you want to force to an IP address here.
 # The example below send any host in double-click.net to a local
 # web-server.
-#dnsmasq_configure_address:
-#  double-click.net: '127.0.0.1'
+#dnsmasq_configure_addresses:
+#  - domain: double-click.net
+#    ip: '127.0.0.1'
 
 # --address (and --server) work with IPv6 addresses too.
-#dnsmasq_configure_address:
-#  www.thekelleys.org.uk: 'fe80::20d:60ff:fe36:f83'
+#dnsmasq_configure_addresses:
+#  - domain: www.thekelleys.org.uk
+#    ip: 'fe80::20d:60ff:fe36:f83'
 
 # Add the IPs of all queries to yahoo.com, google.com, and their
 # subdomains to the vpn and search ipsets:
@@ -245,7 +247,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 
 # Enable DHCPv6. Note that the prefix-length does not need to be specified
 # and defaults to 64 if missing/
-#dnamsq_configure_dhcp_ranges:
+#dnsmasq_configure_dhcp_ranges:
 #  - range:
 #      from: '1234::2'
 #      to: '1234::500'
@@ -407,13 +409,13 @@ dnsmasq_configure_disable_systemd_resolved: False
 
 # Send extra options which are tagged as "red" to any machine whose
 # DHCP vendorclass string includes the substring "Linux"
-#dnsmasq_configure_dhcp_vendorclasses:
+#dnsmasq_configure_dhcp_vendor_classes:
 #  - set: red
 #    includes: Linux
 
 # Send extra options which are tagged as "red" to any machine one
 # of whose DHCP userclass strings includes the substring "accounts"
-#dnsmasq_configure_dhcp_userclasses:
+#dnsmasq_configure_dhcp_user_classes:
 #  - set: red
 #    includes: accounts
 
@@ -837,7 +839,7 @@ dnsmasq_configure_disable_systemd_resolved: False
 # This alias makes a result of 1.2.3.4 appear as 5.6.7.8
 #dnsmasq_configure_aliases:
 #  - src: '1.2.3.4'
-#    target: '5.6.7.8'
+#    dest: '5.6.7.8'
 
 # and this maps 1.2.3.x to 5.6.7.x
 #dnsmasq_configure_aliases:
